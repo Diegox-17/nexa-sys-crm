@@ -518,6 +518,38 @@ services:
 
 ---
 
+## 11. Configuración de Proxy Inverso (Nginx)
+
+### 11.1 Error Común: X-Forwarded-For Header
+
+Al usar Nginx como reverse proxy, puede aparecer este error:
+
+```
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false.
+```
+
+**Solución:** Configurar Express para confiar en el proxy.
+
+```javascript
+// src/backend/app.js
+const app = express();
+
+// Trust the first proxy (Nginx) to correctly read X-Forwarded-For headers
+app.set('trust proxy', 1);
+```
+
+**Y en los rate limiters:**
+
+```javascript
+// src/backend/middleware/security.js
+const generalLimiter = rateLimit({
+    // ...
+    trustProxy: true, // Trust Nginx reverse proxy for correct IP detection
+});
+```
+
+---
+
 **Documento mantenido por:** @Agente-Arquitecto
 **Última actualización:** 2026-01-06
-**Versión:** 2.2 (BUG-043 & BUG-044 Fix)
+**Versión:** 2.3 (BUG-043, BUG-044 & Proxy Fix)

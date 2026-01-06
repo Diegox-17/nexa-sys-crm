@@ -20,6 +20,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ============================================
+// TRUST PROXY CONFIGURATION (for Nginx reverse proxy)
+// ============================================
+// Trust the first proxy (Nginx) to correctly read X-Forwarded-For headers
+// This fixes the express-rate-limit error about unexpected X-Forwarded-For
+app.set('trust proxy', 1);
+
+// ============================================
 // SECURITY MIDDLEWARE
 // ============================================
 // Helmet helps secure Express apps by setting various HTTP headers

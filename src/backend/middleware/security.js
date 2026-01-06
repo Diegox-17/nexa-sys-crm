@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 /**
  * Rate limiting middleware to prevent abuse
  * BUG-039 FIX: Increased limits for development environment
- * Original: 100 requests / 15min → New: 1000 requests / 15min
+ * BUG-XXX FIX: Added trustProxy to fix X-Forwarded-For error with Nginx reverse proxy
  */
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -11,6 +11,7 @@ const generalLimiter = rateLimit({
     message: 'Demasiadas solicitudes desde esta IP, por favor intente más tarde.',
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    trustProxy: true, // Trust Nginx reverse proxy for correct IP detection
 });
 
 /**
@@ -26,6 +27,7 @@ const authLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skipSuccessfulRequests: true, // Don't count successful logins
+    trustProxy: true, // Trust Nginx reverse proxy for correct IP detection
 });
 
 /**
@@ -40,6 +42,7 @@ const apiLimiter = rateLimit({
     message: 'Límite de solicitudes API excedido, por favor intente más tarde.',
     standardHeaders: true,
     legacyHeaders: false,
+    trustProxy: true, // Trust Nginx reverse proxy for correct IP detection
 });
 
 module.exports = {
