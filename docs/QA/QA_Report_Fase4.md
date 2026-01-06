@@ -385,3 +385,293 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 **Validación:** BUG-042 Correction Verified
 **Fecha:** 2026-01-05
 **Estado:** ✅ **REPORTE ACTUALIZADO Y CERRADO**
+
+---
+
+## 🐛 BUG-043: Docker Compose Smoke Test Failed - Health Check Timeout
+
+| Aspecto | Valor |
+|---------|-------|
+| **ID** | BUG-043 |
+| **Severidad** | 🔴 CRÍTICA |
+| **Tipo** | CI/CD - Docker Infrastructure |
+| **Estado** | 🔴 **ABIERTO** |
+| **Fecha Detectado** | 2026-01-06 |
+| **Pipeline Stage** | Stage 5: Docker Compose Smoke Test |
+| **Exit Code** | 124 (Timeout) |
+
+### 📋 Descripción del Problema
+
+El pipeline de CI/CD falló en el stage de **Docker Compose Smoke Test** con el siguiente output:
+
+```
+🔧 Docker Compose Smoke Test
+Waiting for backend to be healthy...
+Waiting for backend to be healthy...
+Waiting for frontend to be healthy...
+Error: Process completed with exit code 124.
+```
+
+El **exit code 124** indica que el comando `timeout` expiró (60 segundos) esperando que los contenedores alcanzaran el estado "healthy".
+
+### 📊 Análisis de Causa Raíz
+
+#### Posibles Causas Identificadas:
+
+1. **Health Check Backend No Responde**
+   - El endpoint `/health` del backend no está respondiendo con código 200
+   - El contenedor backend podría estar fallando al inicio
+   - Posible error de conexión a PostgreSQL (en modo Docker)
+
+2. **Frontend Health Check Incorrecto**
+   ```
+   CMD wget --quiet --tries=1 --spider http://localhost/health
+   ```
+   - Nginx no tiene un endpoint `/health` configurado
+   - El healthcheck debe改成 probar `http://localhost/` directamente
+
+3. **Orden de Inicialización**
+   - El backend depende de la DB (correcto con `condition: service_healthy`)
+   - El frontend depende del backend (correcto)
+   - Pero el tiempo de `start_period` podría ser insuficiente
+
+### 🔧 Configuración Actual (docker-compose.yml)
+
+```yaml
+backend:
+  healthcheck:
+    test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ]
+    interval: 30s
+    timeout: 3s
+    retries: 3
+    start_period: 10s
+
+frontend:
+  healthcheck:
+    test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health" ]
+    interval: 30s
+    timeout: 3s
+    retries: 3
+    start_period: 5s
+```
+
+### ✅ Solución Propuesta
+
+#### 1. Corregir Frontend Health Check
+**Archivo:** `src/frontend/Dockerfile` y `docker-compose.yml`
+
+```dockerfile
+# Cambiar de:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+    CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
+
+# A:
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
+    CMD wget --quiet --tries=1 --spider http://localhost/ || exit 0
+```
+
+#### 2. Aumentar start_period del Backend
+**Archivo:** `docker-compose.yml`
+
+```yaml
+backend:
+  healthcheck:
+    start_period: 30s  # Aumentar de 10s a 30s
+```
+
+#### 3. Agregar Logs en Caso de Failure
+**Archivo:** `.github/workflows/ci-cd.yml`
+
+El paso "Show Docker logs on failure" ya existe pero podría no ejecutarse si el timeout mata el job.
+
+### 📋 Acciones Requeridas
+
+| Prioridad | Responsable | Acción |
+|-----------|-------------|--------|
+| 🟡 MEDIA | DevOps | Corregir healthcheck del frontend (nginx no tiene /health) |
+| 🟡 MEDIA | Backend | Verificar endpoint /health responde correctamente en Docker |
+| 🟢 BAJA | DevOps | Aumentar start_period a 30s |
+| 🟢 BAJA | DevOps | Agregar logging más verboso antes del timeout |
+
+### 🎯 Criterios de Aceptación
+
+- [ ] El smoke test completa en menos de 60 segundos
+- [ ] Backend responde 200 en `/health`
+- [ ] Frontend responde 200 en `/`
+- [ ] Exit code 0 en Docker Compose Smoke Test
+
+---
+
+## 🐛 BUG-044: PostgreSQL init.sql No Se Carga - Is a directory
+
+| Aspecto | Valor |
+|---------|-------|
+| **ID** | BUG-044 |
+| **Severidad** | 🔴 CRÍTICA |
+| **Tipo** | Deployment - Docker/PostgreSQL |
+| **Estado** | 🔴 **ABIERTO** |
+| **Fecha Detectado** | 2026-01-06 |
+| **Entorno** | Servidor Linux con Docker + Portainer |
+| **Exit Code** | N/A (Error de PostgreSQL) |
+
+### 📋 Descripción del Problema
+
+En el servidor de producción (Linux con Docker y Portainer), el script de inicialización de PostgreSQL no se ejecuta correctamente:
+
+```
+2026-01-06 06:20:31.677 UTC [41] LOG:  database system is ready to accept connections
+ done
+server started
+CREATE DATABASE
+/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
+psql:/docker-entrypoint-initdb.d/init.sql: error: could not read from input file: Is a directory
+```
+
+El error `could not read from input file: Is a directory` indica que PostgreSQL está intentando leer `init.sql` pero lo encuentra como un **directorio** en lugar de un archivo.
+
+### 📊 Análisis de Causa Raíz
+
+#### El volumen está mal configurado:
+
+```yaml
+# docker-compose.yml línea 13
+volumes:
+  - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+```
+
+**Posibles causas del error:**
+
+1. **Directorio con nombre `init.sql` existe en el servidor**
+   - En Linux, `./init.sql` podría ser un directorio si alguien creó `init.sql/` por error
+   - Docker monta el directorio en lugar del archivo
+
+2. **Ruta incorrecta en Portainer**
+   - Al configurar el stack en Portainer, la ruta del archivo podría estar mal
+   - El working directory de Portainer podría ser diferente
+
+3. **Problema de case sensitivity**
+   - El servidor Linux tiene case-sensitive filesystem
+   - El archivo podría llamarse `INIT.SQL` o `Init.sql`
+
+4. **Archivo no existe en la ruta montada**
+   - Si el archivo no existe, Docker podría crear un directorio vacío con ese nombre
+
+### 🔧 Verificación en el Servidor
+
+```bash
+# Verificar si init.sql es archivo o directorio
+ls -la ./init.sql
+
+# Si es directorio, mover el archivo y eliminar el directorio
+mv ./init.sql/init.sql ./init.sql.actual
+rmdir ./init.sql
+
+# Verificar contenido del archivo
+file ./init.sql
+
+# Verificar permisos
+ls -la /docker-entrypoint-initdb.d/
+```
+
+### ✅ Solución Propuesta
+
+#### Opción 1: Corregir estructura de archivos en servidor
+```bash
+# En el servidor, verificar y corregir
+ls -la ./init.sql
+# Si muestra "d" (directory), renombrar
+mv ./init.sql init_directory
+ls -la init_directory/  # Ver contenido
+```
+
+#### Opción 2: Usar volumen named para init scripts
+**Archivo:** `docker-compose.yml`
+
+```yaml
+# Más seguro - copiar el archivo en el Dockerfile de postgres
+# O usar un volumen单独:
+
+volumes:
+  # Opción A: Copiar al build time
+  - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  # Opción B (recomendada para producción): Usar variable de entorno
+  # y configurar la DB mediante script externo
+```
+
+#### Opción 3: Crear Dockerfile personalizado para PostgreSQL
+```dockerfile
+# postgres.Dockerfile
+FROM postgres:15-alpine
+COPY init.sql /docker-entrypoint-initdb.d/
+```
+
+### 📋 Acciones Requeridas
+
+| Prioridad | Responsable | Acción |
+|-----------|-------------|--------|
+| 🔴 CRÍTICA | DevOps | Verificar en servidor si `init.sql` es directorio |
+| 🔴 CRÍTICA | DevOps | Corregir estructura de archivos en servidor |
+| 🟡 MEDIA | DevOps | Documentar estructura de archivos requerida |
+| 🟢 BAJA | Arquitecto | Considerar Dockerfile personalizado para PostgreSQL |
+
+### 🎯 Criterios de Aceptación
+
+- [ ] El script init.sql se ejecuta sin errores
+- [ ] Las tablas se crean correctamente
+- [ ] Los datos seed se insertan
+- [ ] El servicio DB reporta "ready to accept connections"
+
+### 🔍 Pasos de Diagnóstico en Servidor
+
+```bash
+# 1. Verificar estructura actual
+pwd
+ls -la
+
+# 2. Verificar si init.sql es directorio
+test -f ./init.sql && echo "Es archivo" || echo "Es directorio"
+
+# 3. Verificar contenido
+cat ./init.sql 2>/dev/null || echo "No es archivo legible"
+
+# 4. Verificar permisos Docker
+docker exec -it nexasys-db ls -la /docker-entrypoint-initdb.d/
+```
+
+### ⚠️ Nota de Deployment con Portainer
+
+Al crear stack en Portainer:
+1. Verificar que el archivo `init.sql` esté en el mismo directorio que `docker-compose.yml`
+2. Verificar que no existe un directorio `init.sql` en el sistema de archivos
+3. Usar "Upload" de Portainer para asegurar que los archivos se copian correctamente
+4. Habilitar "Purge volumes" solo si se desea perder datos persistentes
+
+---
+
+## 📋 Resumen de Bugs Nuevos
+
+| ID | Severidad | Tipo | Estado | Descripción |
+|----|-----------|------|--------|-------------|
+| BUG-043 | 🔴 CRÍTICA | CI/CD | ABIERTO | Docker Compose Smoke Test timeout (exit 124) |
+| BUG-044 | 🔴 CRÍTICA | Deployment | ABIERTO | init.sql tratado como directorio en servidor |
+
+---
+
+## 🎯 Acciones Inmediatas Requeridas
+
+### Para DevOps/Arquitecto:
+
+1. **BUG-043**: Corregir healthcheck del frontend (nginx no tiene `/health`)
+2. **BUG-044**: Verificar estructura de archivos en servidor Linux
+3. **Ambos**: Actualizar documentación de deployment
+
+### Para Backend:
+
+1. **BUG-043**: Verificar endpoint `/health` responde en modo Docker
+
+---
+
+**Firmado:** @QA-Auditor-Agent
+**Reporte Actualizado:** 2026-01-06
+**Estado:** 🔴 **DOS BUGS CRÍTICOS ABIERTOS - REQUIEREN ATENCIÓN INMEDIATA**

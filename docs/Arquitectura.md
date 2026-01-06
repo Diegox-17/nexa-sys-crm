@@ -370,6 +370,153 @@ const createCustomFieldSchema = Joi.object({
 
 ---
 
+## 10. Infraestructura Docker (BUG-044 Fix)
+
+### 10.1 Arquitectura de Contenedores
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Docker Network                         │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
+│  │   Frontend  │───▶│   Backend   │───▶│ PostgreSQL  │    │
+│  │  (Nginx)    │    │   (Node)    │    │  (Custom)   │    │
+│  └─────────────┘    └─────────────┘    └─────────────┘    │
+│        │                                       │           │
+│        ▼                                       ▼           │
+│   Port 8080                              Port 5432         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 10.2 Dockerfile de PostgreSQL (BUG-044)
+
+**Archivo:** `postgres.Dockerfile`
+
+```dockerfile
+FROM postgres:15-alpine
+
+# Copiar el script de inicialización al directorio de entrada de Docker
+# Este script se ejecutará automáticamente cuando el contenedor se inicie por primera vez
+COPY init.sql /docker-entrypoint-initdb.d/init.sql
+
+# Establecer permisos de lectura para el script
+RUN chmod 444 /docker-entrypoint-initdb.d/init.sql
+
+# Exponer puerto PostgreSQL
+EXPOSE 5432
+```
+
+**为什么 (Por qué):** Este enfoque soluciona el BUG-044 donde el volumen montaba un directorio en lugar del archivo `init.sql`, causando el error `Is a directory`. Al copiar el archivo durante el build de la imagen:
+
+- El archivo se incluye directamente en la imagen Docker
+- No depende de la configuración de volúmenes del servidor
+- Elimina la posibilidad de error por estructura de archivos del host
+
+### 10.3 Configuración docker-compose.yml (Actualizada)
+
+```yaml
+services:
+  db:
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
+    image: nexasys/postgres:15-alpine
+    container_name: nexasys-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexa_admin
+      POSTGRES_PASSWORD: nexa_password
+      POSTGRES_DB: nexasys_crm
+    volumes:
+      # BUG-044: Ya no necesitamos montar init.sql como volumen
+      # El script se copia durante el build del Dockerfile personalizado
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U nexa_admin -d nexasys_crm" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+    container_name: nexasys-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    environment:
+      DATABASE_URL: postgres://nexa_admin:nexa_password@db:5432/nexasys_crm
+      JWT_SECRET: ${JWT_SECRET:-nexasys_secret_2025}
+      PORT: 5000
+      NODE_ENV: production
+      USE_DATABASE: 'true'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 30s  # BUG-043: Aumentado para dar tiempo a PostgreSQL
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: nexasys-frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s  # BUG-043: Corregido de /health a /
+```
+
+### 10.4 Deployment en Servidor Linux (Portainer)
+
+**Pasos para deployment:**
+
+1. Verificar que `init.sql` es un archivo, no un directorio:
+   ```bash
+   ls -la ./init.sql
+   # Debe mostrar: -rw-r--r--  1 user user 1234 Jan  6 10:00 init.sql
+   # NO debe mostrar: drwxr-xr-x  2 user user   4096 Jan  6 10:00 init.sql
+   ```
+
+2. Verificar estructura del directorio:
+   ```
+   ├── docker-compose.yml
+   ├── postgres.Dockerfile
+   ├── init.sql
+   ├── src/
+   │   ├── backend/
+   │   │   └── Dockerfile
+   │   └── frontend/
+   │       └── Dockerfile
+   ```
+
+3. En Portainer:
+   - Seleccionar "Upload" para asegurar archivos correctos
+   - Verificar que no exista directorio `init.sql`
+   - Habilitar "Purge volumes" solo si se desea resetear datos
+
+4. Deployment:
+   ```bash
+   docker compose down -v  # Opcional: eliminar volúmenes anteriores
+   docker compose build --no-cache
+   docker compose up -d
+   ```
+
+---
+
 **Documento mantenido por:** @Agente-Arquitecto
-**Última actualización:** 2026-01-03
-**Versión:** 2.1 (BUG #025/026 Fix)
+**Última actualización:** 2026-01-06
+**Versión:** 2.2 (BUG-043 & BUG-044 Fix)

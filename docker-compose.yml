@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15-alpine
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
+    image: nexasys/postgres:15-alpine
     container_name: nexasys-db
     restart: unless-stopped
     environment:
@@ -10,7 +13,8 @@ services:
       POSTGRES_PASSWORD: nexa_password
       POSTGRES_DB: nexasys_crm
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # BUG-044: Ya no necesitamos montar init.sql como volumen
+      # El script se copia durante el build del Dockerfile personalizado
       - postgres_data:/var/lib/postgresql/data
     networks:
       - crm-internal
