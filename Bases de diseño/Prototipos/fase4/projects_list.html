@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXA-Sys | Gestión de Proyectos</title>
+    <!-- Favicon would go here -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* Base Variables from index.css */
+        :root {
+            --color-primary: #0B1E3B;
+            --color-secondary: #00F0FF;
+            --color-accent: #64748B;
+            --color-bg-dark: #0F172A;
+            --color-bg-light: #FFFFFF;
+            --color-text-dark: #E2E8F0;
+            --color-text-light: #1E293B;
+            --color-glass: rgba(15, 23, 42, 0.7);
+            --color-glass-border: rgba(255, 255, 255, 0.1);
+
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+
+            --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+            --border-radius: 4px;
+            --transition-fast: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-dark);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout Structure from Dashboard.css */
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            grid-row: 1 / -1;
+            grid-column: 1 / 2;
+            background: rgba(11, 30, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--color-glass-border);
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            padding-left: 0.5rem;
+        }
+
+        .sidebar-brand img {
+            height: 32px;
+            width: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 0.925rem;
+            letter-spacing: 0.05em;
+            transition: var(--transition-fast);
+            border-radius: var(--border-radius);
+            margin-bottom: 4px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--color-secondary);
+            background: rgba(0, 240, 255, 0.05);
+            /* Proper background highlight */
+            padding-left: 1rem;
+        }
+
+        /* Removed ::before arrow */
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--color-glass-border);
+            padding-top: var(--spacing-md);
+        }
+
+        /* Topbar Styles */
+        .topbar {
+            grid-column: 2 / -1;
+            grid-row: 1 / 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .breadcrumbs {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            letter-spacing: 0.1em;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            border: 1px solid var(--color-secondary);
+            /* Cyan border */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2 / -1;
+            grid-row: 2 / -1;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        /* Specific Page Styles replicated */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .text-slate {
+            color: var(--color-accent);
+        }
+
+        /* Components */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary {
+            background: var(--color-secondary);
+            color: var(--color-primary);
+            border: none;
+        }
+
+        .btn-outline {
+            border: 1px solid var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--color-secondary);
+            color: var(--color-secondary);
+        }
+
+        .card {
+            background: var(--color-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--color-glass-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(11, 30, 59, 0.5);
+            border: 1px solid var(--color-accent);
+            color: white;
+            border-radius: var(--border-radius);
+            font-family: var(--font-family);
+            transition: var(--transition-fast);
+        }
+
+        /* Table Styles */
+        .data-table-container {
+            background: var(--color-glass);
+            border: 1px solid var(--color-glass-border);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            border-bottom: 1px solid var(--color-glass-border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7em;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .status-badge-progreso {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--color-secondary);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <!-- Corrected Path -->
+                <img src="../../../src/frontend/public/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys">
+            </div>
+            <nav style="flex: 1;">
+                <a href="#" class="nav-item">Panel</a>
+                <a href="#" class="nav-item">Analítica</a>
+                <a href="#" class="nav-item">Clientes</a>
+                <a href="#" class="nav-item active">Proyectos</a> <!-- New Item -->
+                <a href="#" class="nav-item">Gestión de Usuarios</a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn btn-outline" style="width: 100%; font-size: 0.75rem;">SALIR</button>
+                <div
+                    style="font-size: 0.75rem; color: var(--color-accent); font-family: var(--font-mono); margin-top: 1rem;">
+                    ROLE: ADMIN<br>
+                    SEC_LEVEL: 1
+                </div>
+            </div>
+        </aside>
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="breadcrumbs">SISTEMA / PROYECTOS / LISTA</div>
+            <div class="user-menu">
+                <span>admin01</span>
+                <div class="avatar">AD</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1>Gestión de Proyectos</h1>
+                    <p class="text-slate" style="font-size: 0.875rem;">Administración y seguimiento de proyectos
+                        vinculados a clientes.</p>
+                </div>
+                <button class="btn btn-primary" onclick="alert('Open Modal')">+ NUEVO PROYECTO</button>
+            </div>
+
+            <!-- Toolbar/Filters -->
+            <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                <input type="text" class="form-input" placeholder="Buscar proyecto..." style="max-width: 400px;">
+                <select class="form-input" style="max-width: 200px; background: var(--color-primary);">
+                    <option>Todos los Estados</option>
+                    <option>En Progreso</option>
+                    <option>Finalizado</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>PROYECTO</th>
+                            <th>CLIENTE</th>
+                            <th>ESTADO</th>
+                            <th>RESPONSABLE</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="window.location.href='project_detail.html'" style="cursor: pointer;">
+                            <td style="font-family: var(--font-mono); opacity: 0.6;">#PRJ-001</td>
+                            <td><strong>Implementación CRM</strong></td>
+                            <td>TechCorp</td>
+                            <td><span class="status-badge status-badge-progreso">EN PROGRESO</span></td>
+                            <td>Ana Project</td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; font-size: 0.7rem;">✏️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-family: var(--font-mono); opacity: 0.6;">#PRJ-002</td>
+                            <td>Consultoría de Procesos</td>
+                            <td>Innovate S.A.</td>
+                            <td><span class="status-badge"
+                                    style="border: 1px solid var(--color-accent); color: var(--color-accent);">COTIZADO</span>
+                            </td>
+                            <td>Carlos Manager</td>
+                            <td>
+                                <button class="btn" style="padding: 4px 8px; font-size: 0.7rem;">✏️</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

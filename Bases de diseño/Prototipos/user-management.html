@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa-Sys | Gestión de Usuarios</title>
+    <link rel="icon" href="assets/Favicon Nexa-Sys.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-row: 1 / -1;
+            background: rgba(11, 30, 59, 0.4);
+            border-right: 1px solid var(--color-glass-border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+        }
+
+        .sidebar-brand img {
+            height: 32px;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 4px;
+            font-size: 0.925rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--color-secondary);
+        }
+
+        .nav-item.active {
+            border-left: 2px solid var(--color-secondary);
+        }
+
+        /* Top Bar */
+        .topbar {
+            grid-column: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            background: rgba(15, 23, 42, 0.2);
+        }
+
+        .breadcrumbs {
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.825rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            border: 1px solid var(--color-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: var(--spacing-md);
+        }
+
+        /* Table Styles */
+        .data-table-container {
+            background: var(--color-glass);
+            border: 1px solid var(--color-glass-border);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            background: rgba(11, 30, 59, 0.6);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            font-size: 0.9rem;
+            color: var(--color-text-dark);
+        }
+
+        .data-table tr:hover {
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .badge-admin {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--color-secondary);
+            border: 1px solid var(--color-secondary);
+        }
+
+        .badge-manager {
+            background: rgba(100, 116, 139, 0.1);
+            color: #94a3b8;
+            border: 1px solid #475569;
+        }
+
+        .badge-user {
+            background: rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
+            border: 1px solid #475569;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-active {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .status-inactive {
+            background-color: #ef4444;
+        }
+
+        /* Modal Simulation */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys">
+            </div>
+            <nav style="flex: 1;">
+                <a href="dashboard.html" class="nav-item">Panel</a>
+                <a href="#" class="nav-item">Analítica</a>
+                <a href="#" class="nav-item">Clientes</a>
+                <div style="height: 1px; background: var(--color-glass-border); margin: var(--spacing-md) 0;"></div>
+                <a href="#" class="nav-item active">Gestión de Usuarios</a>
+                <a href="#" class="nav-item">Configuración</a>
+            </nav>
+            <div style="font-size: 0.75rem; color: var(--color-accent); font-family: var(--font-mono);">
+                ROLE: ADMINISTRADOR<br>
+                SEC_LEVEL: 1
+            </div>
+        </aside>
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="breadcrumbs">SISTEMA / ADMIN / GESTIÓN_USUARIOS</div>
+            <div class="user-menu">
+                <span style="color: white; font-size: 0.875rem;">Administrador</span>
+                <div class="avatar">AD</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content animate-fade-in">
+            <div class="page-header">
+                <div>
+                    <h1>Gestión de Usuarios</h1>
+                    <p class="text-slate" style="font-size: 0.875rem;">Administración de credenciales y permisos del
+                        sistema.</p>
+                </div>
+                <button class="btn btn-primary" onclick="document.getElementById('modal').style.display='flex'">+ NUEVO
+                    USUARIO</button>
+            </div>
+
+            <div class="search-bar" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                <input type="text" class="form-input" placeholder="Buscar por nombre o email..."
+                    style="max-width: 400px;">
+                <select class="form-input" style="max-width: 200px; background: var(--color-primary);">
+                    <option>Todos los Roles</option>
+                    <option>Admin</option>
+                    <option>Manager</option>
+                    <option>User</option>
+                </select>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>IDENTIFICADOR</th>
+                            <th>USUARIO</th>
+                            <th>EMAIL CORPORATIVO</th>
+                            <th>ROL</th>
+                            <th>ESTADO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span style="font-family: var(--font-mono); opacity: 0.6;">#NX-001</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar" style="width: 28px; height: 28px; font-size: 0.7rem;">DI</div>
+                                    Diego Ibañez
+                                </div>
+                            </td>
+                            <td>diego@nexa-sys.com</td>
+                            <td><span class="badge badge-admin">ADMIN</span></td>
+                            <td><span class="status-dot status-active"></span> Activo</td>
+                            <td>
+                                <button class="btn" style="padding: 4px 10px; font-size: 0.7rem;">EDITAR</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span style="font-family: var(--font-mono); opacity: 0.6;">#NX-002</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar" style="width: 28px; height: 28px; font-size: 0.7rem;">JS</div>
+                                    Juan Salas
+                                </div>
+                            </td>
+                            <td>j.salas@nexa-sys.com</td>
+                            <td><span class="badge badge-manager">MANAGER</span></td>
+                            <td><span class="status-dot status-active"></span> Activo</td>
+                            <td>
+                                <button class="btn" style="padding: 4px 10px; font-size: 0.7rem;">EDITAR</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span style="font-family: var(--font-mono); opacity: 0.6;">#NX-003</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar" style="width: 28px; height: 28px; font-size: 0.7rem;">AL</div>
+                                    Ana Lopez
+                                </div>
+                            </td>
+                            <td>a.lopez@nexa-sys.com</td>
+                            <td><span class="badge badge-user">USER</span></td>
+                            <td><span class="status-dot status-inactive"></span> Inactivo</td>
+                            <td>
+                                <button class="btn" style="padding: 4px 10px; font-size: 0.7rem;">EDITAR</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Mockup -->
+    <div id="modal" class="modal-overlay">
+        <div class="card modal-card">
+            <h3
+                style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--color-glass-border); padding-bottom: 0.5rem;">
+                Registrar Nuevo Operador</h3>
+            <form onsubmit="event.preventDefault(); document.getElementById('modal').style.display='none'">
+                <div class="input-group">
+                    <label class="input-label">NOMBRE COMPLETO</label>
+                    <input type="text" class="form-input" placeholder="Ej. Carlos Ruiz" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">EMAIL CORPORATIVO</label>
+                    <input type="email" class="form-input" placeholder="c.ruiz@nexa-sys.com" required>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label">ASIGNAR ROL</label>
+                        <select class="form-input" style="background: var(--color-primary);">
+                            <option value="user">User</option>
+                            <option value="manager">Manager</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">CLAVE TEMPORAL</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn"
+                        onclick="document.getElementById('modal').style.display='none'">CANCELAR</button>
+                    <button type="submit" class="btn btn-primary">DAR DE ALTA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

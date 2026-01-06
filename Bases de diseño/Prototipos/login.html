@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa-Sys | Iniciar Sesión</title>
+    <link rel="icon" href="assets/Favicon Nexa-Sys.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .login-layout {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 0%, #1a2c4e 0%, var(--color-bg-dark) 70%);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .brand-logo img {
+            height: 60px;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .brand-tagline {
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.825rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(11, 30, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(11, 30, 59, 0.3) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(0, 240, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            animation: scan 8s linear infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg">
+        <div class="scan-line"></div>
+    </div>
+
+    <div class="login-layout container">
+        <div class="login-card animate-fade-in">
+            <div class="brand-logo">
+                <img src="assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys Logo">
+                <p class="brand-tagline">Laboratorio de Ingeniería de Negocios</p>
+            </div>
+
+            <div class="card">
+                <form action="dashboard.html">
+                    <div class="input-group">
+                        <label class="input-label">ID DE ACCESO</label>
+                        <input type="text" class="form-input" placeholder="usr_88291..." required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">CLAVE DE SEGURIDAD</label>
+                        <input type="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-lg);">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            Iniciar Sesión
+                        </button>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-md); text-align: center;">
+                        <a href="#" class="text-slate"
+                            style="font-size: 0.875rem; text-decoration: none; border-bottom: 1px dashed var(--color-accent);">Recuperar
+                            Acceso</a>
+                    </div>
+                </form>
+            </div>
+
+            <div style="margin-top: var(--spacing-md); text-align: center; font-size: 0.75rem; color: #334155;">
+                <p>CONEXIÓN SEGURA // ENCRIPTADO: AES-256</p>
+                <p style="margin-top: 4px;">NEXA-SYS v1.0.0-alpha</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

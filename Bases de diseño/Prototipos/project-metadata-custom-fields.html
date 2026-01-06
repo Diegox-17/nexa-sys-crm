@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXA-Sys - Prototipos BUG #025 y #026</title>
+    <style>
+        /* Nexa-Sys Design System - Styles from index.css */
+        :root {
+            --color-primary: #0B1E3B;
+            --color-secondary: #00F0FF;
+            --color-accent: #64748B;
+            --color-bg-dark: #0F172A;
+            --color-bg-light: #FFFFFF;
+            --color-text-dark: #E2E8F0;
+            --color-text-light: #1E293B;
+            --color-glass: rgba(15, 23, 42, 0.7);
+            --color-glass-border: rgba(255, 255, 255, 0.1);
+            --color-success: #10B981;
+            --color-warning: #F59E0B;
+            --color-danger: #EF4444;
+
+            --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 4rem;
+
+            --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+            --border-radius: 4px;
+            --transition-fast: 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh;
+        }
+
+        .sidebar {
+            grid-row: 1 / -1;
+            background: rgba(11, 30, 59, 0.4);
+            border-right: 1px solid var(--color-glass-border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+        }
+
+        .sidebar-brand {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-brand img {
+            height: 32px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 4px;
+            font-size: 0.925rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--color-secondary);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            border-top: 1px solid var(--color-glass-border);
+            padding-top: 1.5rem;
+        }
+
+        .topbar {
+            grid-column: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .breadcrumbs {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            letter-spacing: 0.1em;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            border: 1px solid var(--color-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        .main-content {
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .text-slate {
+            color: var(--color-accent);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--color-secondary);
+            color: var(--color-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-primary {
+            background: var(--color-secondary);
+            color: var(--color-primary);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #00D4E0;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-outline {
+            border-color: var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .btn-outline:hover {
+            background: rgba(100, 116, 139, 0.1);
+            box-shadow: none;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.25rem;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .icon-btn:hover {
+            opacity: 1;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--color-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--color-glass-border);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-lg);
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.875rem;
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(11, 30, 59, 0.5);
+            border: 1px solid var(--color-accent);
+            color: white;
+            border-radius: var(--border-radius);
+            transition: var(--transition-fast);
+            font-size: 0.9rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+        }
+
+        .form-input::placeholder {
+            color: var(--color-accent);
+            opacity: 0.5;
+        }
+
+        select.form-input {
+            cursor: pointer;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .input-group {
+            flex: 1;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: var(--color-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--color-glass-border);
+            border-radius: 8px;
+            padding: 2rem;
+            min-width: 500px;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-card h3 {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-header h3 {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin: 1.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .section-header h4 {
+            color: var(--color-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            border: 1px solid;
+        }
+
+        .status-high {
+            border-color: var(--color-danger);
+            color: var(--color-danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status-medium {
+            border-color: var(--color-warning);
+            color: var(--color-warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .status-low {
+            border-color: var(--color-success);
+            color: var(--color-success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        /* Currency Input */
+        .currency-input {
+            position: relative;
+        }
+
+        .currency-input::before {
+            content: '$';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+        }
+
+        .currency-input input {
+            padding-left: 28px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--color-accent);
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: var(--color-text-dark);
+        }
+
+        .tab.active {
+            color: var(--color-secondary);
+            border-bottom-color: var(--color-secondary);
+        }
+
+        /* Field List (for Field Manager) */
+        .field-list {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .field-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .field-info {
+            opacity: 1;
+        }
+
+        .field-info.inactive {
+            opacity: 0.5;
+        }
+
+        .field-name {
+            font-weight: 600;
+            display: block;
+        }
+
+        .field-meta {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .field-category {
+            color: var(--color-secondary);
+        }
+
+        /* Field Editor Section */
+        .field-editor {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        .field-editor h4 {
+            margin-bottom: 1rem;
+            color: var(--color-secondary);
+        }
+
+        /* Prototype Container */
+        .prototype-section {
+            margin-bottom: 4rem;
+            padding-top: 1rem;
+        }
+
+        .prototype-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-secondary);
+        }
+
+        .prototype-desc {
+            color: var(--color-accent);
+            margin-bottom: 2rem;
+        }
+
+        .prototype-container {
+            border: 1px dashed var(--color-glass-border);
+            border-radius: 8px;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Grid Layout for Modal */
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-grid .input-group {
+            margin-bottom: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-card {
+                min-width: auto;
+                width: 95%;
+                margin: 1rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ================= PROTOTIPO 1: MODAL DE EDICIÓN DE PROYECTO CON METADATOS (BUG #025) ================= -->
+    <div class="prototype-section">
+        <h2 class="prototype-title">BUG #025: Modal de Edición de Proyecto con Metadatos Faltantes</h2>
+        <p class="prototype-desc">Propuesta para agregar campos de negocio críticos: Presupuesto, Prioridad, Responsable y Fechas.</p>
+
+        <div class="prototype-container">
+            <!-- Simulated Modal -->
+            <div class="modal-overlay" style="position: relative; display: flex; background: transparent;">
+                <div class="card modal-card">
+                    <h3>Editar Proyecto</h3>
+                    <form>
+                        <!-- Basic Info -->
+                        <div class="input-group">
+                            <label for="proj-name" class="input-label">NOMBRE DEL PROYECTO</label>
+                            <input id="proj-name" type="text" class="form-input" value="Migración Cloud - Corp. Alfa" />
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-client" class="input-label">CLIENTE</label>
+                                <select id="proj-client" class="form-input" style="background: var(--color-primary);">
+                                    <option value="1">Corporación Alfa S.A.</option>
+                                    <option value="2">Tech Solutions Inc.</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-priority" class="input-label">PRIORIDAD</label>
+                                <select id="proj-priority" class="form-input" style="background: var(--color-primary);">
+                                    <option value="high" class="status-high">ALTA</option>
+                                    <option value="medium" class="status-medium">MEDIA</option>
+                                    <option value="low" class="status-low">BAJA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Business Metadata - NEW SECTION -->
+                        <div class="section-header">
+                            <h4>Metadatos de Negocio</h4>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-budget" class="input-label">PRESUPUESTO ESTIMADO</label>
+                                <div class="currency-input">
+                                    <input id="proj-budget" type="number" class="form-input" value="45000" placeholder="0.00" />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-responsible" class="input-label">RESPONSABLE</label>
+                                <select id="proj-responsible" class="form-input" style="background: var(--color-primary);">
+                                    <option value="1">Juan Pérez (Admin)</option>
+                                    <option value="2">María García (Manager)</option>
+                                    <option value="3">Carlos López (Developer)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-start" class="input-label">FECHA INICIO</label>
+                                <input id="proj-start" type="date" class="form-input" value="2025-01-15" />
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-end" class="input-label">FECHA FIN (ESTIMADA)</label>
+                                <input id="proj-end" type="date" class="form-input" value="2025-06-30" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-progress" class="input-label">PORCENTAJE AVANCE (%)</label>
+                                <input id="proj-progress" type="number" class="form-input" value="35" min="0" max="100" />
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-status" class="input-label">ESTADO</label>
+                                <select id="proj-status" class="form-input" style="background: var(--color-primary);">
+                                    <option value="prospectado">Prospectado</option>
+                                    <option value="en_progreso" selected>En Progreso</option>
+                                    <option value="pausado">Pausado</option>
+                                    <option value="finalizado">Finalizado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="input-group">
+                            <label for="proj-desc" class="input-label">DESCRIPCIÓN</label>
+                            <textarea id="proj-desc" class="form-input" rows="3">Migración completa del sistema legacy a infraestructura cloud AWS. Incluye bases de datos, aplicaciones y servicios.</textarea>
+                        </div>
+
+                        <!-- Actions -->
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" class="btn">CANCELAR</button>
+                            <button type="submit" class="btn btn-primary">GUARDAR CAMBIOS</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PROTOTIPO 2: ADMINISTRADOR DE CAMPOS PERSONALIZADOS (BUG #026) ================= -->
+    <div class="prototype-section">
+        <h2 class="prototype-title">BUG #026: Administrador de Campos Personalizados para Proyectos</h2>
+        <p class="prototype-desc">Interfaz para que el Admin gestione projectFieldDefinitions sin tocar código (similar a ClientManagement).</p>
+
+        <div class="prototype-container">
+            <!-- Simulated Modal with Tabs -->
+            <div class="modal-overlay" style="position: relative; display: flex; background: transparent;">
+                <div class="card modal-card" style="max-width: 800px;">
+                    <div class="modal-header">
+                        <h3>Administrador de Campos - Proyectos</h3>
+                        <button class="btn btn-sm">+ Nuevo Campo</button>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab active">Campos Activos (5)</button>
+                        <button class="tab">Todos los Campos</button>
+                    </div>
+
+                    <!-- Field List -->
+                    <div class="field-list">
+                        <div class="field-item">
+                            <div class="field-info">
+                                <span class="field-name">URL del Repositorio <span class="field-category">(General)</span></span>
+                                <span class="field-meta">ID: repo_url | Tipo: URL</span>
+                            </div>
+                            <div>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Desactivar">👁️</button>
+                            </div>
+                        </div>
+                        <div class="field-item">
+                            <div class="field-info">
+                                <span class="field-name">Stack Tecnológico <span class="field-category">(Técnico)</span></span>
+                                <span class="field-meta">ID: tech_stack | Tipo: Multi-select</span>
+                            </div>
+                            <div>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Desactivar">👁️</button>
+                            </div>
+                        </div>
+                        <div class="field-item">
+                            <div class="field-info">
+                                <span class="field-name">Horas Estimadas <span class="field-category">(Gestión)</span></span>
+                                <span class="field-meta">ID: estimated_hours | Tipo: Número</span>
+                            </div>
+                            <div>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Desactivar">👁️</button>
+                            </div>
+                        </div>
+                        <div class="field-item">
+                            <div class="field-info">
+                                <span class="field-name">Sprint Actual <span class="field-category">(Agile)</span></span>
+                                <span class="field-meta">ID: current_sprint | Tipo: Número</span>
+                            </div>
+                            <div>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Desactivar">👁️</button>
+                            </div>
+                        </div>
+                        <div class="field-item">
+                            <div class="field-info">
+                                <span class="field-name">Enlace a Documentación <span class="field-category">(General)</span></span>
+                                <span class="field-meta">ID: doc_link | Tipo: URL</span>
+                            </div>
+                            <div>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Desactivar">👁️</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Field Editor (Expanded) -->
+                    <div class="field-editor">
+                        <h4>Editar Campo</h4>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">ETIQUETA (LABEL)</label>
+                                <input type="text" class="form-input" value="Stack Tecnológico" />
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">IDENTIFICADOR (ID)</label>
+                                <input type="text" class="form-input" value="tech_stack" disabled style="opacity: 0.5;" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">CATEGORÍA</label>
+                                <input type="text" class="form-input" list="project-categories" value="Técnico" />
+                                <datalist id="project-categories">
+                                    <option value="General"></option>
+                                    <option value="Técnico"></option>
+                                    <option value="Gestión"></option>
+                                    <option value="Agile"></option>
+                                    <option value="Financiero"></option>
+                                </datalist>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">TIPO DE DATO</label>
+                                <select class="form-input" style="background: var(--color-primary);">
+                                    <option value="text">Texto</option>
+                                    <option value="number">Número</option>
+                                    <option value="date">Fecha</option>
+                                    <option value="url">URL</option>
+                                    <option value="email">Email</option>
+                                    <option value="select">Lista Desplegable</option>
+                                    <option value="multiselect">Multi-selección</option>
+                                    <option value="checkbox">Casilla de verificación</option>
+                                    <option value="textarea">Texto Largo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">VALORES (Para select/multiselect)</label>
+                                <input type="text" class="form-input" placeholder="React; Vue; Angular; Node.js" />
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">VALOR POR DEFECTO</label>
+                                <input type="text" class="form-input" placeholder="" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label class="input-label">ORDEN DE PRESENTACIÓN</label>
+                                <input type="number" class="form-input" value="2" min="1" />
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">REQUERIDO</label>
+                                <div style="display: flex; align-items: center; height: 42px;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" style="margin-right: 8px;" /> Campo obligatorio
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button class="btn">CANCELAR</button>
+                            <button class="btn">ELIMINAR CAMPO</button>
+                            <button class="btn btn-primary">ACTUALIZAR CAMPO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PROTOTIPO 3: FORMULARIO DE PROYECTO CON CAMPOS PERSONALIZADOS ================= -->
+    <div class="prototype-section">
+        <h2 class="prototype-title">Integración: Formulario de Proyecto con Campos Personalizados</h2>
+        <p class="prototype-desc">Como se vería el modal de creación/edición con campos personalizados dinámicos.</p>
+
+        <div class="prototype-container">
+            <div class="modal-overlay" style="position: relative; display: flex; background: transparent;">
+                <div class="card modal-card">
+                    <h3>Crear Nuevo Proyecto</h3>
+                    <form>
+                        <!-- Basic Info -->
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="new-proj-name" class="input-label">NOMBRE DEL PROYECTO</label>
+                                <input id="new-proj-name" type="text" class="form-input" placeholder="Ej. Nuevo Sistema CRM" />
+                            </div>
+                            <div class="input-group">
+                                <label for="new-proj-priority" class="input-label">PRIORIDAD</label>
+                                <select id="new-proj-priority" class="form-input" style="background: var(--color-primary);">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="high">ALTA</option>
+                                    <option value="medium">MEDIA</option>
+                                    <option value="low">BAJA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="new-proj-client" class="input-label">CLIENTE</label>
+                                <select id="new-proj-client" class="form-input" style="background: var(--color-primary);">
+                                    <option value="">Seleccionar cliente...</option>
+                                    <option value="1">Corporación Alfa S.A.</option>
+                                    <option value="2">Tech Solutions Inc.</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="new-proj-budget" class="input-label">PRESUPUESTO ESTIMADO</label>
+                                <div class="currency-input">
+                                    <input id="new-proj-budget" type="number" class="form-input" placeholder="0.00" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="new-proj-start" class="input-label">FECHA INICIO</label>
+                                <input id="new-proj-start" type="date" class="form-input" />
+                            </div>
+                            <div class="input-group">
+                                <label for="new-proj-end" class="input-label">FECHA FIN (ESTIMADA)</label>
+                                <input id="new-proj-end" type="date" class="form-input" />
+                            </div>
+                            <div class="input-group">
+                                <label for="new-proj-responsible" class="input-label">RESPONSABLE</label>
+                                <select id="new-proj-responsible" class="form-input" style="background: var(--color-primary);">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="1">Juan Pérez</option>
+                                    <option value="2">María García</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Custom Fields -->
+                        <div class="section-header">
+                            <h4>Campos Personalizados</h4>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-repo" class="input-label">URL DEL REPOSITORIO</label>
+                                <input id="proj-repo" type="url" class="form-input" placeholder="https://github.com/..." />
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-hours" class="input-label">HORAS ESTIMADAS</label>
+                                <input id="proj-hours" type="number" class="form-input" placeholder="0" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label for="proj-stack" class="input-label">STACK TECNOLÓGICO</label>
+                                <select id="proj-stack" class="form-input" style="background: var(--color-primary);" multiple>
+                                    <option value="react">React</option>
+                                    <option value="vue">Vue.js</option>
+                                    <option value="angular">Angular</option>
+                                    <option value="node">Node.js</option>
+                                    <option value="python">Python</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="proj-sprint" class="input-label">SPRINT ACTUAL</label>
+                                <input id="proj-sprint" type="number" class="form-input" placeholder="1" />
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="proj-docs" class="input-label">ENLACE A DOCUMENTACIÓN</label>
+                            <input id="proj-docs" type="url" class="form-input" placeholder="https://docs.google.com/..." />
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button type="button" class="btn">CANCELAR</button>
+                            <button type="submit" class="btn btn-primary">CREAR PROYECTO</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= REFERENCIA: CÓMO SE IMPLEMENTA EN CLIENTMANAGEMENT ================= -->
+    <div class="prototype-section">
+        <h2 class="prototype-title">Referencia: Implementación en ClientManagement.jsx</h2>
+        <p class="prototype-desc">El patrón existente que se seguirá para la implementación de los prototipos anteriores.</p>
+
+        <div class="prototype-container" style="background: rgba(0, 240, 255, 0.05); padding: 1.5rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--color-secondary);">
+            <p style="margin-bottom: 1rem; color: var(--color-text-dark);"><strong>Patrón de implementación (ya existente en ClientManagement):</strong></p>
+            <pre style="white-space: pre-wrap;">
+// 1. Estado para campos personalizados
+const [fields, setFields] = useState([]);
+
+// 2. Fetch de campos desde API
+const fetchFields = async () => {
+    const data = await clientsAPI.getFields();
+    setFields(data);
+};
+
+// 3. Group fields por categoría
+const groupedFields = fields.reduce((acc, field) => {
+    if (!field.active) return acc;
+    const cat = field.category || 'General';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(field);
+    return acc;
+}, {});
+
+// 4. Renderizado dinámico en formulario
+{Object.keys(groupedFields).length > 0 && (
+    &lt;div className="custom-fields-section"&gt;
+        {Object.entries(groupedFields).map(([category, catFields]) => (
+            &lt;div key={category}&gt;
+                &lt;h4&gt;{category}&lt;/h4&gt;
+                {catFields.map(field => (
+                    &lt;div key={field.id} className="input-group"&gt;
+                        &lt;label className="input-label"&gt;{field.label}&lt;/label&gt;
+                        &lt;input type={field.type} value={formData.custom_data[field.name] || ''}
+                            onChange={e => setFormData({
+                                ...formData,
+                                custom_data: { ...formData.custom_data, [field.name]: e.target.value }
+                            })} /&gt;
+                    &lt;/div&gt;
+                ))}
+            &lt;/div&gt;
+        ))}
+    &lt;/div&gt;
+)}
+            </pre>
+        </div>
+    </div>
+
+</body>
+</html>

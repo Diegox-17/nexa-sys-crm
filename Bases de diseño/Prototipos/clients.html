@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa-Sys | Gestión de Clientes</title>
+    <link rel="icon" href="assets/Favicon Nexa-Sys.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh;
+        }
+
+        /* Reusing sidebar/topbar styles from styles.css (assumed to be global) 
+           but adding them here just in case they aren't fully covered or for specific overrides */
+
+        /* Sidebar */
+        .sidebar {
+            grid-row: 1 / -1;
+            background: rgba(11, 30, 59, 0.4);
+            border-right: 1px solid var(--color-glass-border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+        }
+
+        .sidebar-brand img {
+            height: 32px;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 4px;
+            font-size: 0.925rem;
+            transition: var(--transition-fast);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--color-secondary);
+        }
+
+        .nav-item.active {
+            border-left: 2px solid var(--color-secondary);
+        }
+
+        /* Top Bar */
+        .topbar {
+            grid-column: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            background: rgba(15, 23, 42, 0.2);
+        }
+
+        .breadcrumbs {
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.825rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            border: 1px solid var(--color-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        .main-content {
+            grid-column: 2;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            padding-bottom: var(--spacing-md);
+        }
+
+        .data-table-container {
+            background: var(--color-glass);
+            border: 1px solid var(--color-glass-border);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            background: rgba(11, 30, 59, 0.6);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-glass-border);
+            font-size: 0.9rem;
+            color: var(--color-text-dark);
+        }
+
+        .data-table tr:hover {
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-active {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .status-inactive {
+            background-color: #ef4444;
+        }
+
+        /* Specific Phase 3 Styles */
+        .project-tag {
+            display: inline-block;
+            background: rgba(100, 116, 139, 0.2);
+            color: #cbd5e1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--color-accent);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--color-secondary);
+            background: rgba(0, 240, 255, 0.1);
+            border-color: rgba(0, 240, 255, 0.3);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 600px;
+            /* Wider for clients */
+            animation: slideUp 0.3s ease-out;
+            max-height: 90vh;
+            /* Scroll if tall */
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .custom-fields-section {
+            margin-top: 1.5rem;
+            border-top: 1px dashed var(--color-accent);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys">
+            </div>
+            <nav style="flex: 1;">
+                <a href="dashboard.html" class="nav-item">Panel</a>
+                <a href="#" class="nav-item">Analítica</a>
+                <a href="#" class="nav-item active">Clientes</a>
+                <a href="#" class="nav-item">Proyectos</a>
+                <div style="height: 1px; background: var(--color-glass-border); margin: var(--spacing-md) 0;"></div>
+                <a href="user-management.html" class="nav-item">Gestión de Usuarios</a>
+                <a href="#" class="nav-item">Configuración</a>
+            </nav>
+            <div style="font-size: 0.75rem; color: var(--color-accent); font-family: var(--font-mono);">
+                ROLE: ADMINISTRADOR<br>
+                SEC_LEVEL: 1
+            </div>
+        </aside>
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="breadcrumbs">SISTEMA / ADMIN / GESTIÓN_CLIENTES</div>
+            <div class="user-menu">
+                <span style="color: white; font-size: 0.875rem;">Administrador</span>
+                <div class="avatar">AD</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content animate-fade-in">
+            <div class="page-header">
+                <div>
+                    <h1>Cartera de Clientes</h1>
+                    <p class="text-slate" style="font-size: 0.875rem;">Administración centralizada de cuentas y
+                        prospectos comerciales.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" style="border-color: var(--color-accent); color: var(--color-accent);"
+                        onclick="document.getElementById('modal-fields').style.display='flex'">
+                        ⚙️ CAMPOS
+                    </button>
+                    <button class="btn btn-primary"
+                        onclick="document.getElementById('modal-client').style.display='flex'">
+                        + NUEVO CLIENTE
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-bar" style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                <input type="text" class="form-input" placeholder="Buscar por empresa, contacto o email..."
+                    style="max-width: 400px;">
+                <select class="form-input" style="max-width: 200px; background: var(--color-primary);">
+                    <option value="all">Industria: Todas</option>
+                    <option value="tech">Tecnología</option>
+                    <option value="retail">Retail</option>
+                    <option value="finance">Finanzas</option>
+                </select>
+                <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                    <span class="text-slate" style="font-size: 0.8rem;">VISTA:</span>
+                    <button class="btn"
+                        style="padding: 6px 12px; font-size: 0.7rem; background: rgba(0, 240, 255, 0.1);">TODOS</button>
+                    <button class="btn"
+                        style="padding: 6px 12px; font-size: 0.7rem; color: var(--color-accent); border-color: var(--color-glass-border);">ACTIVOS</button>
+                </div>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>CLIENTE / EMPRESA</th>
+                            <th>GIRO COMERCIAL</th>
+                            <th>CONTACTO PRINCIPAL</th>
+                            <th>DATOS DE CONTACTO</th>
+                            <th>PROYECTOS</th>
+                            <th>ESTADO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar"
+                                        style="width: 32px; height: 32px; font-size: 0.8rem; border-color: rgba(255,255,255,0.2); color: white;">
+                                        IN</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Innovatech S.A.</div>
+                                        <div style="font-size: 0.75rem; color: var(--color-accent);">ID: CL-8291</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Tecnología</td>
+                            <td>Carlos Mendez</td>
+                            <td style="font-size: 0.8rem;">
+                                <div>c.mendez@innovatech.com</div>
+                                <div class="text-slate">+52 55 1234 5678</div>
+                            </td>
+                            <td>
+                                <span class="project-tag">Migración Cloud</span>
+                                <span class="project-tag">App Móvil</span>
+                            </td>
+                            <td><span class="status-dot status-active"></span> Activo</td>
+                            <td>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Visibilidad">👁️</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="avatar"
+                                        style="width: 32px; height: 32px; font-size: 0.8rem; border-color: rgba(255,255,255,0.2); color: white;">
+                                        GR</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Grupo Retail MX</div>
+                                        <div style="font-size: 0.75rem; color: var(--color-accent);">ID: CL-1022</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Retail</td>
+                            <td>Sofia Ramirez</td>
+                            <td style="font-size: 0.8rem;">
+                                <div>sramirez@gruporetail.mx</div>
+                                <div class="text-slate">+52 81 8888 9999</div>
+                            </td>
+                            <td>
+                                <span class="project-tag">eCommerce</span>
+                            </td>
+                            <td><span class="status-dot status-inactive"></span> Inactivo</td>
+                            <td>
+                                <button class="icon-btn" title="Editar">✏️</button>
+                                <button class="icon-btn" title="Activar">🚫</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Client Form Modal -->
+    <div id="modal-client" class="modal-overlay">
+        <div class="card modal-card">
+            <h3
+                style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--color-glass-border); padding-bottom: 0.5rem;">
+                Registrar Nuevo Cliente
+            </h3>
+            <form onsubmit="event.preventDefault(); document.getElementById('modal-client').style.display='none'">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label">NOMBRE DE LA EMPRESA</label>
+                        <input type="text" class="form-input" placeholder="Ej. Corporativo Alpha" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">GIRO COMERCIAL</label>
+                        <select class="form-input" style="background: var(--color-primary);">
+                            <option value="">Seleccionar...</option>
+                            <option value="tech">Tecnología</option>
+                            <option value="finance">Finanzas</option>
+                            <option value="retail">Retail</option>
+                            <option value="health">Salud</option>
+                            <option value="other">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">CONTACTO PRINCIPAL</label>
+                    <input type="text" class="form-input" placeholder="Nombre completo del contacto" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label class="input-label">CORREO ELECTRÓNICO</label>
+                        <input type="email" class="form-input" placeholder="contacto@empresa.com" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">TELÉFONO</label>
+                        <input type="tel" class="form-input" placeholder="+52 ..." required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">OBSERVACIONES</label>
+                    <textarea class="form-input" rows="3"
+                        placeholder="Notas adicionales sobre el cliente..."></textarea>
+                </div>
+
+                <!-- Custom Fields Section (Dynamic) -->
+                <div class="custom-fields-section">
+                    <label class="input-label" style="color: var(--color-secondary); margin-bottom: 1rem;">CAMPOS
+                        ADICIONALES (Configurados)</label>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label class="input-label">RFC <span class="text-slate">(Texto)</span></label>
+                            <input type="text" class="form-input" placeholder="RFC de facturación">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">FECHA ANIVERSARIO <span class="text-slate">(Fecha)</span></label>
+                            <input type="date" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn"
+                        onclick="document.getElementById('modal-client').style.display='none'">CANCELAR</button>
+                    <button type="submit" class="btn btn-primary">GUARDAR CLIENTE</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Field Manager Modal -->
+    <div id="modal-fields" class="modal-overlay">
+        <div class="card modal-card" style="max-width: 500px;">
+            <h3
+                style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--color-glass-border); padding-bottom: 0.5rem;">
+                Administrador de Campos
+            </h3>
+            <p class="text-slate" style="font-size: 0.875rem; margin-bottom: 1.5rem;">
+                Agregue campos personalizados que serán visibles en el formulario de clientes para todos los usuarios.
+            </p>
+
+            <div style="background: rgba(0,0,0,0.2); border-radius: 4px; padding: 1rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">RFC</span>
+                    <span class="badge badge-user">TEXTO</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 600;">Fecha Aniversario</span>
+                    <span class="badge badge-user">FECHA</span>
+                </div>
+            </div>
+
+            <form onsubmit="event.preventDefault(); alert('Campo agregado (Simulado)');">
+                <div class="input-group">
+                    <label class="input-label">NOMBRE DEL NUEVO CAMPO</label>
+                    <input type="text" class="form-input" placeholder="Ej. Número de Empleados" required>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">TIPO DE DATO</label>
+                    <select class="form-input" style="background: var(--color-primary);">
+                        <option value="text">Texto Corto</option>
+                        <option value="number">Número</option>
+                        <option value="date">Fecha</option>
+                        <option value="longtext">Texto Largo</option>
+                    </select>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn"
+                        onclick="document.getElementById('modal-fields').style.display='none'">CERRAR</button>
+                    <button type="submit" class="btn btn-primary">AGREGAR CAMPO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

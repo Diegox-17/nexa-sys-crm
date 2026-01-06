@@ -1,0 +1,196 @@
+/* Nexa-Sys Design System
+   Concept: Industrial-Digital / Clean Tech
+   Palette: Deep Midnight Blue, Electric Cyan, Slate Grey
+*/
+
+:root {
+    /* Colors */
+    --color-primary: #0B1E3B;
+    /* Deep Midnight Blue */
+    --color-secondary: #00F0FF;
+    /* Electric Cyan */
+    --color-accent: #64748B;
+    /* Slate Grey */
+    --color-bg-dark: #0F172A;
+    /* Dark Mode Background */
+    --color-bg-light: #FFFFFF;
+    /* Light Mode Background */
+    --color-text-dark: #E2E8F0;
+    /* Text on Dark */
+    --color-text-light: #1E293B;
+    /* Text on Light */
+    --color-glass: rgba(15, 23, 42, 0.7);
+    --color-glass-border: rgba(255, 255, 255, 0.1);
+
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+
+    /* Effects */
+    --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --border-radius: 4px;
+    /* Industrial feel - slightly sharper */
+    --transition-fast: 0.2s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Utilities */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-cyan {
+    color: var(--color-secondary);
+}
+
+.text-slate {
+    color: var(--color-accent);
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: white;
+}
+
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 2.25rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* Components */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    background: rgba(0, 240, 255, 0.1);
+    box-shadow: var(--shadow-glow);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.btn-primary {
+    background: var(--color-secondary);
+    color: var(--color-primary);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #50fbff;
+    /* Lighter cyan */
+    color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.card {
+    background: var(--color-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+}
+
+.input-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.input-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(11, 30, 59, 0.5);
+    border: 1px solid var(--color-accent);
+    color: white;
+    border-radius: var(--border-radius);
+    transition: var(--transition-fast);
+    font-family: var(--font-family);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 1px var(--color-secondary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}

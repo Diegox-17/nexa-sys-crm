@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexa-Sys | Panel</title>
+    <link rel="icon" href="assets/Favicon Nexa-Sys.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 64px 1fr;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            grid-row: 1 / -1;
+            background: rgba(11, 30, 59, 0.4);
+            border-right: 1px solid var(--color-glass-border);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-md);
+        }
+
+        .sidebar-brand {
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand img {
+            height: 32px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--color-accent);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 4px;
+            transition: var(--transition-fast);
+            font-size: 0.925rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--color-secondary);
+        }
+
+        .nav-item.active {
+            border-left: 2px solid var(--color-secondary);
+        }
+
+        /* Top Bar */
+        .topbar {
+            grid-column: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--spacing-lg);
+            border-bottom: 1px solid var(--color-glass-border);
+            background: rgba(15, 23, 42, 0.2);
+        }
+
+        .breadcrumbs {
+            color: var(--color-accent);
+            font-family: var(--font-mono);
+            font-size: 0.825rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--color-primary);
+            border: 1px solid var(--color-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-secondary);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        /* User Panel Specifics */
+        .profile-header {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-glass-border);
+        }
+
+        .profile-avatar-lg {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, var(--color-primary), #1a3c70);
+            border: 2px solid var(--color-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--color-secondary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background: rgba(11, 30, 59, 0.3);
+            border: 1px solid var(--color-glass-border);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+        }
+
+        .stat-label {
+            color: var(--color-accent);
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys">
+            </div>
+
+            <nav style="flex: 1;">
+                <a href="#" class="nav-item">Panel</a>
+                <a href="#" class="nav-item">Analítica</a>
+                <a href="#" class="nav-item">Clientes</a>
+                <a href="#" class="nav-item">Proyectos</a>
+                <div style="height: 1px; background: var(--color-glass-border); margin: var(--spacing-md) 0;"></div>
+                <a href="#" class="nav-item active">Panel de Usuario</a>
+                <a href="#" class="nav-item">Configuración del Sistema</a>
+            </nav>
+
+            <div style="font-size: 0.75rem; color: var(--color-accent); font-family: var(--font-mono);">
+                ESTADO: EN LÍNEA<br>
+                PING: 14ms
+            </div>
+        </aside>
+
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="breadcrumbs">
+                SISTEMA / USUARIO / CONF_PERFIL
+            </div>
+            <div class="user-menu">
+                <span style="color: white; font-size: 0.875rem;">Diego Ibañez</span>
+                <div class="avatar">DI</div>
+            </div>
+        </header>
+
+        <!-- Main Content (User Panel View) -->
+        <main class="main-content animate-fade-in">
+            <div class="container">
+                <div class="profile-header">
+                    <div class="profile-avatar-lg">DI</div>
+                    <div style="flex: 1;">
+                        <h1 style="font-size: 2rem; margin-bottom: 4px;">Diego Ibañez</h1>
+                        <p class="text-cyan" style="font-family: var(--font-mono);">Rol: Administrador del Sistema</p>
+                    </div>
+                    <div>
+                        <button class="btn">Editar Perfil</button>
+                    </div>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">ÚLTIMO ACCESO</div>
+                        <div class="stat-value">Hoy <span
+                                style="font-size: 1rem; color: var(--color-accent);">14:20</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">NIVEL DE SEGURIDAD</div>
+                        <div class="stat-value text-cyan">NIVEL 1</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">SESIONES ACTIVAS</div>
+                        <div class="stat-value">1</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3
+                        style="margin-bottom: var(--spacing-md); border-bottom: 1px solid var(--color-glass-border); padding-bottom: var(--spacing-sm);">
+                        Preferencias del Sistema</h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg);">
+                        <div>
+                            <form>
+                                <div class="input-group">
+                                    <label class="input-label">NOMBRE PARA MOSTRAR</label>
+                                    <input type="text" class="form-input" value="Diego Ibañez">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">DIRECCIÓN DE CORREO</label>
+                                    <input type="email" class="form-input" value="diego@nexa-sys.com">
+                                </div>
+                            </form>
+                        </div>
+
+                        <div>
+                            <div class="input-group">
+                                <label class="input-label">PREFERENCIA DE TEMA</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="btn btn-primary" style="flex: 1;">Oscuro (Predet.)</button>
+                                    <button class="btn" style="flex: 1; opacity: 0.5;">Claro</button>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">NOTIFICACIONES</label>
+                                <div
+                                    style="background: rgba(11, 30, 59, 0.5); padding: 1rem; border-radius: 4px; border: 1px solid var(--color-accent);">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                        <span style="color: white; font-size: 0.9rem;">Alertas por Correo</span>
+                                        <span class="text-cyan">ON</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: white; font-size: 0.9rem;">Sonidos del Sistema</span>
+                                        <span class="text-slate">OFF</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-md); text-align: right;">
+                        <button class="btn btn-primary">Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

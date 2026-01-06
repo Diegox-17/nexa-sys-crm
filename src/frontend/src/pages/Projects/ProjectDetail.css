@@ -1,0 +1,249 @@
+/* ProjectDetail.css - Homologated Styles for NEXA-Sys */
+.project-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+    margin: 0.5rem 0;
+}
+
+.back-link {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.back-link:hover {
+    opacity: 1;
+    color: var(--color-secondary);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.kpi-card {
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-secondary);
+}
+
+.kpi-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+}
+
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Project Details Section */
+.project-details-section {
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-glass-border);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.detail-card {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.detail-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    color: var(--color-secondary);
+    font-weight: 500;
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-high {
+    background: rgba(255, 71, 87, 0.15);
+    border: 1px solid #ff4757;
+    color: #ff4757;
+}
+
+.priority-medium {
+    background: rgba(255, 165, 2, 0.15);
+    border: 1px solid #ffa502;
+    color: #ffa502;
+}
+
+.priority-low {
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid #00F0FF;
+    color: #00F0FF;
+}
+
+.description-section {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+.description-text {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Custom Fields Section - Bottom of Page */
+.custom-fields-section-bottom {
+    background: var(--color-glass);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.custom-field-category-bottom {
+    margin-bottom: 1.25rem;
+}
+
+.custom-category-title {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dashed var(--color-glass-border);
+}
+
+.custom-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.custom-field-item {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+.custom-field-label {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.35rem;
+}
+
+.custom-field-value {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    word-break: break-word;
+}
+
+.custom-field-value .no-data {
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* Responsive for Custom Fields */
+@media (max-width: 1024px) {
+    .custom-fields-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .custom-fields-grid {
+        grid-template-columns: 1fr;
+    }
+}

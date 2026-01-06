@@ -1,0 +1,111 @@
+version: '3.8'
+
+# ========================================
+# Docker Compose for TESTING Environment
+# ========================================
+# This file creates an isolated testing environment with:
+# - In-memory database for fast, isolated tests
+# - Volume mounts for live code changes
+# - Test-specific environment variables
+# - No persistent data storage
+
+services:
+  # ========================================
+  # Test Database (PostgreSQL)
+  # ========================================
+  db-test:
+    image: postgres:15-alpine
+    container_name: nexasys-db-test
+    restart: "no" # Don't restart on failure in test mode
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: nexasys_test
+    tmpfs:
+      - /var/lib/postgresql/data # Use in-memory storage for fast tests
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d nexasys_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ========================================
+  # Backend Service (Test Mode)
+  # ========================================
+  backend-test:
+    build:
+      context: ./src/backend
+      dockerfile: Dockerfile
+      target: development # Use development stage with all dependencies
+    container_name: nexasys-backend-test
+    restart: "no"
+    ports:
+      - "5001:5000" # Different port to avoid conflict with production
+    environment:
+      DATABASE_URL: postgres://test_user:test_password@db-test:5432/nexasys_test
+      JWT_SECRET: test_secret_do_not_use_in_production
+      PORT: 5000
+      NODE_ENV: test
+      USE_DATABASE: 'true'
+    volumes:
+      # Mount source code for live changes during development
+      - ./src/backend:/app
+      - /app/node_modules # Prevent overwriting node_modules
+    depends_on:
+      db-test:
+        condition: service_healthy
+    networks:
+      - test-network
+    command: npm test # Run tests on container start
+
+  # ========================================
+  # Frontend Service (Test Mode)
+  # ========================================
+  frontend-test:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+      target: test # Use test stage with all dependencies
+    container_name: nexasys-frontend-test
+    restart: "no"
+    environment:
+      NODE_ENV: test
+      VITE_API_URL: http://backend-test:5000
+    volumes:
+      # Mount source code for live changes during development
+      - ./src/frontend:/app
+      - /app/node_modules # Prevent overwriting node_modules
+    networks:
+      - test-network
+    command: npm test -- --passWithNoTests # Run tests on container start
+
+networks:
+  test-network:
+    driver: bridge
+    name: nexasys-test-network
+
+# ========================================
+# USAGE INSTRUCTIONS
+# ========================================
+# Run all tests in isolated environment:
+#   docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+#
+# Run tests in watch mode (for development):
+#   docker-compose -f docker-compose.test.yml up --build
+#
+# Run only backend tests:
+#   docker-compose -f docker-compose.test.yml up --build backend-test
+#
+# Run only frontend tests:
+#   docker-compose -f docker-compose.test.yml up --build frontend-test
+#
+# Cleanup after tests:
+#   docker-compose -f docker-compose.test.yml down -v
+#
+# Run tests with live code changes (development):
+#   docker-compose -f docker-compose.test.yml up backend-test
+#   # Edit code in src/backend/ and tests will re-run automatically
+# ========================================

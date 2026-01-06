@@ -1,0 +1,123 @@
+/* Nexa-Sys Design System (React Version) */
+:root {
+    --color-primary: #0B1E3B;
+    --color-secondary: #00F0FF;
+    --color-accent: #64748B;
+    --color-bg-dark: #0F172A;
+    --color-bg-light: #FFFFFF;
+    --color-text-dark: #E2E8F0;
+    --color-text-light: #1E293B;
+    --color-glass: rgba(15, 23, 42, 0.7);
+    --color-glass-border: rgba(255, 255, 255, 0.1);
+    
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 4rem;
+
+    --shadow-glow: 0 0 15px rgba(0, 240, 255, 0.3);
+    --border-radius: 4px;
+    --transition-fast: 0.2s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scan {
+    0% { transform: translateY(-100vh); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Global Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-decoration: none;
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    background: rgba(0, 240, 255, 0.1);
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-primary {
+    background: var(--color-secondary);
+    color: var(--color-primary);
+    border: none;
+}
+
+.card {
+    background: var(--color-glass);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+}
+
+.input-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.input-label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(11, 30, 59, 0.5);
+    border: 1px solid var(--color-accent);
+    color: white;
+    border-radius: var(--border-radius);
+    transition: var(--transition-fast);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+}
