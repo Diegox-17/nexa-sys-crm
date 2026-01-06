@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProjectDetail from '../../pages/Projects/ProjectDetail';
-import { projectsAPI, usersAPI } from '../../services/api';
+import { projectsAPI, usersAPI, clientsAPI } from '../../services/api';
 
 // Mock dependencies
 jest.mock('../../services/api');
@@ -50,10 +50,16 @@ describe('ProjectDetail Component', () => {
     { id: 'user2', username: 'jane', role: 'manager' },
   ];
 
+  const mockClients = [
+    { id: 'client1', name: 'Test Client' },
+  ];
+
   beforeEach(() => {
     jest.clearAllMocks();
     projectsAPI.getById.mockResolvedValue(mockProject);
+    projectsAPI.getFields.mockResolvedValue([]);
     usersAPI.getAll.mockResolvedValue(mockUsers);
+    clientsAPI.getAll.mockResolvedValue(mockClients);
     window.alert = jest.fn();
   });
 
@@ -250,12 +256,14 @@ describe('ProjectDetail Component', () => {
       expect(screen.getByText('Test Project')).toBeInTheDocument();
     });
 
-    // Check KPI cards
-    const kpiTitles = screen.getAllByText(/PROGRESO|TAREAS|CLIENTE ID/i);
-    expect(kpiTitles.length).toBeGreaterThan(0);
+    // Check KPI cards exist
+    expect(screen.getByText(/PROGRESO/i)).toBeInTheDocument();
+    expect(screen.getByText(/TAREAS/i)).toBeInTheDocument();
+    expect(screen.getByText(/CLIENTE/i)).toBeInTheDocument();
+    expect(screen.getByText(/RESPONSABLE/i)).toBeInTheDocument();
 
     expect(screen.getByText('3')).toBeInTheDocument(); // Task count
-    expect(screen.getByText('client1')).toBeInTheDocument(); // Client ID
+    expect(screen.getByText('Test Client')).toBeInTheDocument(); // Client name from mock
   });
 
   test('refreshes project data after task creation', async () => {

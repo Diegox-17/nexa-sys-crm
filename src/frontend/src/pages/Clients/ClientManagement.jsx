@@ -161,7 +161,7 @@ const ClientManagement = () => {
     };
 
     // Group fields by category for the Client Form
-    const groupedFields = fields.reduce((acc, field) => {
+    const groupedFields = (fields || []).reduce((acc, field) => {
         if (!field.active) return acc; // Skip inactive fields
         const cat = field.category || 'General';
         if (!acc[cat]) acc[cat] = [];

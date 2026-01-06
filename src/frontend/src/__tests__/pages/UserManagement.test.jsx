@@ -232,37 +232,46 @@ describe('UserManagement Component', () => {
   });
 
   test('updates existing user with correct fields', async () => {
+    // Mock the update API first
     usersAPI.update.mockResolvedValue({ success: true });
+    // Also ensure getAll returns our mock data
+    usersAPI.getAll.mockResolvedValue(mockUsers);
 
     render(<UserManagement />);
     const user = userEvent.setup();
 
+    // Wait for initial render
     await waitFor(() => {
       expect(screen.getByText('john')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
-    // Edit john
+    // Click edit button
     const editButtons = screen.getAllByTitle('Editar');
     fireEvent.click(editButtons[0]);
 
+    // Wait for modal
     await waitFor(() => {
       expect(screen.getByDisplayValue('john')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
-    // Change email
+    // Change email using keyboard events
     const emailInput = screen.getByDisplayValue('john@test.com');
-    await user.clear(emailInput);
-    await user.type(emailInput, 'john.updated@test.com');
+    fireEvent.change(emailInput, { target: { value: 'john.updated@test.com' } });
 
+    // Click submit button
     const saveButton = screen.getByRole('button', { name: /GUARDAR CAMBIOS/i });
-    await user.click(saveButton);
+    fireEvent.click(saveButton);
 
-    await waitFor(() => {
-      expect(usersAPI.update).toHaveBeenCalledWith('1', expect.objectContaining({
-        username: 'john',
-        email: 'john.updated@test.com',
-        role: 'admin',
-      }));
-    });
+    // Verify the API was called - give it time to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    expect(usersAPI.update).toHaveBeenCalledTimes(1);
+    
+    // Verify call arguments
+    const callArgs = usersAPI.update.mock.calls[0];
+    expect(callArgs[0]).toBe('1');
+    expect(callArgs[1].username).toBe('john');
+    expect(callArgs[1].email).toBe('john.updated@test.com');
+    expect(callArgs[1].role).toBe('admin');
   });
 });

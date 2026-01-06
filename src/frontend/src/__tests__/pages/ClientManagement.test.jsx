@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ClientManagement from '../../pages/Clients/ClientManagement';
-import { clientsAPI } from '../../services/api';
+import { clientsAPI, projectsAPI } from '../../services/api';
 
 // Mock dependencies
 jest.mock('../../services/api');
@@ -36,6 +36,11 @@ describe('ClientManagement Component', () => {
     },
   ];
 
+  const mockProjects = [
+    { id: 'p1', name: 'Project 1', client_id: '1' },
+    { id: 'p2', name: 'Project 2', client_id: '2' },
+  ];
+
   const mockFields = [
     { id: '1', name: 'website', label: 'Website', type: 'text', category: 'Contact', active: true },
     { id: '2', name: 'linkedin', label: 'LinkedIn', type: 'url', category: 'Social', active: true },
@@ -45,6 +50,7 @@ describe('ClientManagement Component', () => {
     jest.clearAllMocks();
     clientsAPI.getAll.mockResolvedValue(mockClients);
     clientsAPI.getFields.mockResolvedValue(mockFields);
+    projectsAPI.getAll.mockResolvedValue(mockProjects);
     window.confirm = jest.fn(() => true);
     window.alert = jest.fn();
   });
@@ -129,7 +135,7 @@ describe('ClientManagement Component', () => {
       expect(screen.getByText('Tech Solutions')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText(/Buscar por nombre o industria/i);
+    const searchInput = screen.getByPlaceholderText(/Buscar por empresa o mail/i);
     fireEvent.change(searchInput, { target: { value: 'Acme' } });
 
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
@@ -237,13 +243,18 @@ describe('ClientManagement Component', () => {
     });
   });
 
-  test('displays empty state when no clients', async () => {
+  test('displays empty table when no clients', async () => {
     clientsAPI.getAll.mockResolvedValue([]);
 
     render(<ClientManagement />);
 
     await waitFor(() => {
-      expect(screen.getByText(/No hay clientes registrados/i)).toBeInTheDocument();
+      expect(screen.getByText('Cartera de Clientes')).toBeInTheDocument();
     });
+
+    // Verify table is empty (no rows with client data)
+    const rows = screen.queryAllByRole('row');
+    // Header row + 0 data rows
+    expect(rows.length).toBe(1);
   });
 });

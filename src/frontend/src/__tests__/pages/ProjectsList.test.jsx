@@ -209,14 +209,19 @@ describe('ProjectsList Component', () => {
     });
   });
 
-  test('displays empty state when no projects', async () => {
+  test('displays empty table when no projects', async () => {
     projectsAPI.getAll.mockResolvedValue([]);
 
     render(<ProjectsList />);
 
     await waitFor(() => {
-      expect(screen.getByText(/No hay proyectos registrados/i)).toBeInTheDocument();
+      expect(screen.getByText('Proyectos')).toBeInTheDocument();
     });
+
+    // Verify table is empty (no rows with project data)
+    const rows = screen.queryAllByRole('row');
+    // Header row + 0 data rows
+    expect(rows.length).toBe(1);
   });
 
   test('navigates to project detail when "VER" button is clicked', async () => {

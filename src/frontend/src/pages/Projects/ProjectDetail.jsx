@@ -112,7 +112,7 @@ const ProjectDetail = () => {
         : 0;
 
     // Group custom fields by category
-    const groupedCustomFields = fields
+    const groupedCustomFields = (fields || [])
         .filter(field => field.active)
         .reduce((acc, field) => {
             const category = field.category || 'General';
@@ -177,11 +177,11 @@ const ProjectDetail = () => {
                     <KpiCard title="PROGRESO" value={`${progress}%`} />
                     <KpiCard title="TAREAS" value={project.tasks?.length || 0} />
                     <KpiCard title="CLIENTE" value={(() => {
-                        const client = clients.find(c => c.id == project.client_id);
+                        const client = (clients || []).find(c => c.id == project.client_id);
                         return client ? client.name : 'N/A';
                     })()} />
                     <KpiCard title="RESPONSABLE" value={(() => {
-                        const responsible = users.find(u => u.id == project.responsible_id);
+                        const responsible = (users || []).find(u => u.id == project.responsible_id);
                         return responsible ? responsible.username : 'N/A';
                     })()} />
                 </div>

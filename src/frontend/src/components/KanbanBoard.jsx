@@ -28,7 +28,7 @@ const KanbanBoard = ({ tasks, projectId, onStatusChange, userRole, users = [], o
     // Helper to get assigned user name
     const getAssignedName = (task) => {
         if (task.assigned_name) return task.assigned_name;
-        if (task.assigned_to && users.length > 0) {
+        if (task.assigned_to && (users || []).length > 0) {
             const user = users.find(u => u.id === task.assigned_to);
             return user ? user.username : 'Sin Asignar';
         }
