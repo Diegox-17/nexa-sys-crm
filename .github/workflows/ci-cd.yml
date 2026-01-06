@@ -202,7 +202,7 @@ jobs:
           echo "JWT_SECRET=${{ env.JWT_SECRET }}" > .env
 
       - name: Start services with Docker Compose
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
         env:
           JWT_SECRET: ${{ env.JWT_SECRET }}
 
@@ -236,7 +236,7 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
   # ========================================
   # STAGE 6: Generate Coverage Summary
