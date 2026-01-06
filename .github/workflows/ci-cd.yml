@@ -74,7 +74,7 @@ jobs:
 
       - name: Run backend tests
         working-directory: src/backend
-        run: npm test
+        run: npm test -- --verbose
         env:
           NODE_ENV: test
           JWT_SECRET: ${{ env.JWT_SECRET }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: src/frontend
-        run: npm test -- --passWithNoTests
+        run: npm test -- --verbose --passWithNoTests
         env:
           NODE_ENV: test
 
