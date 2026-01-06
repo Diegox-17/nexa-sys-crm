@@ -59,10 +59,10 @@ fi
 # 5. Verificar que las imágenes necesarias existen
 echo ""
 echo "🔍 Verificando imágenes Docker..."
-if docker images | grep -q "nexasys/postgres"; then
-    echo "   ✅ Imagen nexasys/postgres encontrada"
+if docker images | grep -q "nexasys-postgres"; then
+    echo "   ✅ Imagen nexasys-postgres encontrada"
 else
-    echo "   ℹ️  INFO: La imagen nexasys/postgres será construida durante deployment"
+    echo "   ℹ️  INFO: La imagen nexasys-postgres será construida durante deployment"
 fi
 
 # Resumen

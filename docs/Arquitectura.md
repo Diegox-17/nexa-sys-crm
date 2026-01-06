@@ -419,7 +419,7 @@ services:
     build:
       context: .
       dockerfile: postgres.Dockerfile
-    image: nexasys/postgres:15-alpine
+    image: nexasys-postgres:latest
     container_name: nexasys-db
     restart: unless-stopped
     environment:
