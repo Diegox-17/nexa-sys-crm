@@ -50,8 +50,8 @@ Lanzamiento inicial del sistema NEXA-Sys CRM V.02 con funcionalidad completa.
 
 ### Commits en Rama `main`
 
-| # | Commit ID | Fecha | Autor | Descripción |
-|---|-----------|-------|-------|-------------|
+| # | Commit ID | Fecha      | Autor     | Descripción                                |
+|---|-----------|------------|-----------|--------------------------------------------|
 | 1 | `4b4e188` | 2026-01-05 | Diegox-17 | feat: initial commit - NEXA-Sys CRM v1.0.0 |
 
 ### Detalle del Commit Inicial
@@ -104,20 +104,20 @@ main  ────────────────────────�
 
 ### Convenciones de Nombres
 
-| Tipo de Rama | Formato | Ejemplo |
-|--------------|---------|---------|
-| Feature | `feature/[nombre]` | `feature/user-auth` |
-| Bugfix | `bugfix/[id-descripcion]` | `bugfix/login-issue` |
-| Hotfix | `hotfix/[version]-[descripcion]` | `hotfix/v1.0.1-security` |
-| Release | `release/[version]` | `release/v1.1.0` |
+| Tipo de Rama | Formato                          | Ejemplo                     |
+|--------------|----------------------------------|-----------------------------|
+| Feature      | `feature/[nombre]`               | `feature/user-auth`         |
+| Bugfix       | `bugfix/[id-descripcion]`        | `bugfix/login-issue`        |
+| Hotfix       | `hotfix/[version]-[descripcion]` | `hotfix/v1.0.1-security`    |
+| Release      | `release/[version]`              | `release/v1.1.0`            |
 
 ---
 
 ## 🏷️ Tags de Versión
 
-| Versión | Commit | Fecha | Descripción |
-|---------|--------|-------|-------------|
-| v1.0.0 | `4b4e188` | 2026-01-05 | Primera versión estable |
+| Versión | Commit    | Fecha      | Descripción                                  |
+|---------|-----------|------------|----------------------------------------------|
+| v1.0.0  | `4b4e188` | 2026-01-05 | Primera versión estable                      |
 
 ### Comandos para Tags Futuros
 
@@ -151,17 +151,17 @@ git push --tags
 
 ### Tipos de Commit
 
-| Tipo | Descripción | Ejemplo |
-|------|-------------|---------|
-| `feat` | Nueva característica | `feat: add user profile page` |
-| `fix` | Corrección de bug | `fix: resolve login redirect` |
-| `chore` | Tareas de mantenimiento | `chore: update dependencies` |
-| `docs` | Cambios en documentación | `docs: update API endpoints` |
-| `style` | Formato de código | `style: format with prettier` |
-| `refactor` | Refactorización | `refactor: simplify auth logic` |
-| `test` | Agregar/modificar tests | `test: add login validation tests` |
-| `perf` | Mejoras de rendimiento | `perf: optimize database queries` |
-| `ci` | Cambios en CI/CD | `ci: add GitHub Actions workflow` |
+| Tipo       | Descripción                     | Ejemplo                            |
+|------------|---------------------------------|------------------------------------|
+| `feat`     | Nueva característica            | `feat: add user profile page`      |
+| `fix`      | Corrección de bug               | `fix: resolve login redirect`      |
+| `chore`    | Tareas de mantenimiento         | `chore: update dependencies`       |
+| `docs`     | Cambios en documentación        | `docs: update API endpoints`       |
+| `style`    | Formato de código               | `style: format with prettier`      |
+| `refactor` | Refactorización                 | `refactor: simplify auth logic`    |
+| `test`     | Agregar/modificar tests         | `test: add login validation tests` |
+| `perf`     | Mejoras de rendimiento          | `perf: optimize database queries`  |
+| `ci`       | Cambios en CI/CD                | `ci: add GitHub Actions workflow`  |
 
 ### Ejemplos de Commits
 
@@ -305,13 +305,13 @@ coverage/
 
 ## 📊 Estadísticas del Repositorio
 
-| Métrica | Valor |
-|---------|-------|
-| Total de commits | 1 |
-| Ramas | 1 (main) |
-| Contribuidores | 1 (Diegox-17) |
-| Archivos tracked | 134 |
-| Líneas de código | ~34,799 |
+| Métrica          | Valor         |
+|------------------|---------------|
+| Total de commits | 1             |
+| Ramas            | 1 (main)      |
+| Contribuidores   | 1 (Diegox-17) |
+| Archivos tracked | 134           |
+| Líneas de código | ~34,799       |
 
 ---
 
@@ -372,12 +372,12 @@ git reset --hard HEAD~1
 
 ## 📝 Mantenimiento
 
-| Tarea | Frecuencia | Responsable |
-|-------|------------|-------------|
-| Actualizar CHANGELOG | Por cada release | Owner |
-| Revisar seguridad de dependencias | Mensual | Owner |
-| Actualizar tags de versión | Por cada release | Owner |
-| Revisar logs de CI/CD | Semanal | Owner |
+| Tarea                             | Frecuencia       | Responsable |
+|-----------------------------------|------------------|-------------|
+| Actualizar CHANGELOG              | Por cada release | Owner       |
+| Revisar seguridad de dependencias | Mensual          | Owner       |
+| Actualizar tags de versión        | Por cada release | Owner       |
+| Revisar logs de CI/CD             | Semanal          | Owner       |
 
 ---
 

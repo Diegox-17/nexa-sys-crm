@@ -120,8 +120,10 @@ process.on('SIGINT', () => {
 if (require.main === module) {
     startServer();
 } else {
-    // Initialize database for tests
-    initializeDatabase();
+    // Initialize database for tests (wait for it to complete)
+    initializeDatabase().catch(err => {
+        console.warn('⚠️  Database initialization warning in tests:', err.message);
+    });
 }
 
 module.exports = app;
