@@ -419,7 +419,6 @@ services:
     build:
       context: .
       dockerfile: postgres.Dockerfile
-      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-db
     restart: unless-stopped
     environment:
@@ -441,7 +440,6 @@ services:
     build:
       context: ./src/backend
       dockerfile: Dockerfile
-      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-backend
     restart: unless-stopped
     ports:
@@ -466,7 +464,6 @@ services:
     build:
       context: ./src/frontend
       dockerfile: Dockerfile
-      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:
@@ -481,6 +478,8 @@ services:
       retries: 3
       start_period: 10s  # BUG-043: Corregido de /health a /
 ```
+
+> **Nota:** La configuración de Portainer debe establecerse para **"Build before pull"** o **"Never pull"** para evitar errores con imágenes que no existen en registros públicos.
 
 ### 10.4 Deployment en Servidor Linux (Portainer)
 

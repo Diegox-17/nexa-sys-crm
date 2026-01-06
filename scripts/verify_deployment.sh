@@ -56,13 +56,14 @@ else
     echo "   ⚠️  ADVERTENCIA: init.sql no parece contener CREATE TABLE"
 fi
 
-# 5. Verificar que docker-compose.yml tiene pull_policy: never
+# 5. Verificar estructura del docker-compose.yml
 echo ""
-echo "🔍 Verificando pull_policy en docker-compose.yml..."
-if grep -q "pull_policy: never" ./docker-compose.yml; then
-    echo "   ✅ pull_policy: never configurado (evita errores de pull)"
+echo "🔍 Verificando docker-compose.yml..."
+if grep -q "postgres.Dockerfile" ./docker-compose.yml; then
+    echo "   ✅ docker-compose.yml usa postgres.Dockerfile"
 else
-    echo "   ⚠️  ADVERTENCIA: pull_policy no encontrado - Portainer podría fallar al hacer pull"
+    echo "   ❌ ERROR: docker-compose.yml no referencia postgres.Dockerfile"
+    ERRORS=$((ERRORS + 1))
 fi
 
 # Resumen
