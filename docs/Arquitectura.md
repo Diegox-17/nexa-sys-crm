@@ -419,7 +419,7 @@ services:
     build:
       context: .
       dockerfile: postgres.Dockerfile
-    image: nexasys-postgres:latest
+      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-db
     restart: unless-stopped
     environment:
@@ -441,6 +441,7 @@ services:
     build:
       context: ./src/backend
       dockerfile: Dockerfile
+      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-backend
     restart: unless-stopped
     ports:
@@ -465,6 +466,7 @@ services:
     build:
       context: ./src/frontend
       dockerfile: Dockerfile
+      pull_policy: never  # BUG-044: No hacer pull, usar build local
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:

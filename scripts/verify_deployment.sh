@@ -56,13 +56,13 @@ else
     echo "   ⚠️  ADVERTENCIA: init.sql no parece contener CREATE TABLE"
 fi
 
-# 5. Verificar que las imágenes necesarias existen
+# 5. Verificar que docker-compose.yml tiene pull_policy: never
 echo ""
-echo "🔍 Verificando imágenes Docker..."
-if docker images | grep -q "nexasys-postgres"; then
-    echo "   ✅ Imagen nexasys-postgres encontrada"
+echo "🔍 Verificando pull_policy en docker-compose.yml..."
+if grep -q "pull_policy: never" ./docker-compose.yml; then
+    echo "   ✅ pull_policy: never configurado (evita errores de pull)"
 else
-    echo "   ℹ️  INFO: La imagen nexasys-postgres será construida durante deployment"
+    echo "   ⚠️  ADVERTENCIA: pull_policy no encontrado - Portainer podría fallar al hacer pull"
 fi
 
 # Resumen
