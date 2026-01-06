@@ -25,6 +25,12 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
+# Define build argument for API URL
+ARG VITE_API_URL=/api
+
+# Set environment variable for build
+ENV VITE_API_URL=${VITE_API_URL}
+
 # Copy package files
 COPY package*.json ./
 
@@ -33,10 +39,6 @@ RUN npm ci
 
 # Copy application code from test stage
 COPY --from=test /app .
-
-# Copy environment configuration (needed for API URL)
-# NOTE: .env.production should be created before build
-COPY .env.production .env.production 2>/dev/null || true
 
 # Build the production application
 RUN npm run build
