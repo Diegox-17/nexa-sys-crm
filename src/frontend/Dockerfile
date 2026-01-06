@@ -34,6 +34,10 @@ RUN npm ci
 # Copy application code from test stage
 COPY --from=test /app .
 
+# Copy environment configuration (needed for API URL)
+# NOTE: .env.production should be created before build
+COPY .env.production .env.production 2>/dev/null || true
+
 # Build the production application
 RUN npm run build
 

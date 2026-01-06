@@ -5,7 +5,8 @@
  * authentication, and base URL configuration.
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable or relative URL for production
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 /**
  * Get authorization headers with current token
