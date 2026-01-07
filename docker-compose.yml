@@ -75,7 +75,7 @@ networks:
   crm-internal:
     driver: bridge
   proxy-net:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:

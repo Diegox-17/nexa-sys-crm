@@ -39,13 +39,14 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Initial Admin User (Default: admin/admin123 - Hashed version should be used in production)
+-- Initial Users with PROPER bcrypt password hashes (BUG-FIX)
+-- Generated with bcrypt.hash('password', 10)
 INSERT INTO users (username, email, password_hash, role_id)
-SELECT 'admin', 'admin@nexa-sys.com', 'hashed_admin123_placeholder', id FROM roles WHERE name = 'admin'
+SELECT 'admin', 'admin@nexa-sys.com', '$2a$10$r01xUlV8f6O4iriJZnnpaOt6XS8UJbcjzh7kHnft5QkPhJQ6hUA1C', id FROM roles WHERE name = 'admin'
 UNION ALL
-SELECT 'manager', 'manager@nexa-sys.com', 'hashed_manager123_placeholder', id FROM roles WHERE name = 'manager'
+SELECT 'manager', 'manager@nexa-sys.com', '$2a$10$k/wJpHJK79v14zPDCVZCleDziSSHFDGjLk6wR2sjU5v0oxZ5A2i76', id FROM roles WHERE name = 'manager'
 UNION ALL
-SELECT 'user', 'user@nexa-sys.com', 'hashed_user123_placeholder', id FROM roles WHERE name = 'user'
+SELECT 'user', 'user@nexa-sys.com', '$2a$10$5ZWsbmUIrcUMDVCsX98q9OpsfgdQ42/jVCIUivdwRKGGWR4qlflXa', id FROM roles WHERE name = 'user'
 ON CONFLICT DO NOTHING;
 
 -- ==========================================
