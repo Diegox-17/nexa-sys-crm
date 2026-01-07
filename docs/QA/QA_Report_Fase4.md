@@ -400,19 +400,19 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 
 ---
 
-## 🐛 BUG-043: Docker Compose Smoke Test Failed - Error Red Externa (ACTUALIZADO)
+## 🐛 BUG-043: Docker Compose Smoke Test - Health Checks Independientes (IMPLEMENTADO)
 
 | Aspecto | Valor |
 |---------|-------|
 | **ID** | BUG-043 |
 | **Severidad** | 🔴 CRÍTICA |
 | **Tipo** | CI/CD - Docker Infrastructure |
-| **Estado** | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
+| **Estado** | ✅ **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
 | **Fecha Detectado** | 2026-01-06 |
 | **Fecha Corregido** | 2026-01-07 |
 | **Pipeline Stage** | Stage 5: Docker Compose Smoke Test |
 
-### 📋 Error en CI/CD
+### 📋 Error Original en CI/CD
 
 ```
 Start Services with Docker Compose:
@@ -420,81 +420,156 @@ network proxy-net declared as external, but could not be found
 Error: Process completed with exit code 1.
 ```
 
-### 📊 Causa Raíz
+### ✅ Implementación Completada (DevOps)
 
-**Problema:** La red `proxy-net` estaba configurada como `external: true`, lo que significa que Docker espera que la red ya exista previamente. Si no existe, el deployment falla.
+**Archivos Modificados:**
+- `docker-compose.yml` - Health checks independientes
+- `src/backend/app.js` - Console logs para depuración
 
-**Solución:** Cambiar la red de `external: true` a red interna con `driver: bridge` (Docker la creará automáticamente).
+### 📋 Resumen de Health Checks Independientes
 
-### ✅ Corrección Implementada (DevOps)
+| Servicio | Health Check Verifica | Endpoint | interval | start_period |
+|----------|----------------------|----------|----------|--------------|
+| **DB** | PostgreSQL respondiendo | `pg_isready` | 10s | 10s |
+| **Backend** | Node.js /health responde | `/health` | 10s | 30s |
+| **Frontend** | Nginx /health responde | `/health` | 10s | 10s |
 
-**Archivo:** `docker-compose.yml` (líneas 75-83)
+### 📄 Configuración docker-compose.yml (Implementada)
 
-**ANTES (PROBLEMA):**
 ```yaml
+services:
+  # ============================================
+  # 1. DATABASE (PostgreSQL) - Health check propio
+  # ============================================
+  db:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexa_admin -d nexasys_crm"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # 2. BACKEND (Node.js) - Health check propio
+  # ============================================
+  backend:
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ============================================
+  # 3. FRONTEND (Nginx) - Health check propio
+  # ============================================
+  frontend:
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
 networks:
   crm-internal:
     driver: bridge
   proxy-net:
-    external: true  # ⚠️ PROBLEMA: Espera que la red ya exista
-```
-
-**DESPUÉS (CORREGIDO):**
-```yaml
-networks:
-  crm-internal:
     driver: bridge
-  proxy-net:
-    driver: bridge  # ✅ Docker creará la red automáticamente
 ```
 
-### 📋 Pasos para Deployment en Servidor
+### 📄 Console Logs en Backend (Implementados)
+
+**Archivo:** `src/backend/app.js`
+
+```javascript
+[BACKEND] =========================================
+[BACKEND] NEXA-Sys V.02 CRM - Backend Server
+[BACKEND] =========================================
+[BACKEND] Starting initialization...
+[BACKEND] Attempting database connection...
+[BACKEND] Database connected successfully
+[BACKEND] Server listening on port 5000
+[BACKEND] /health endpoint ready
+[BACKEND] Environment: production
+```
+
+### 📋 Deployment en Servidor
 
 ```bash
-# 1. Hacer git pull
+# 1. Conectarse al servidor
+ssh usuario@servidor
+
+# 2. Ir al directorio del proyecto
+cd /path/al/proyecto
+
+# 3. Hacer git pull
 git pull
 
-# 2. Verificar la configuración
+# 4. Verificar/Crear la red proxy-net
+docker network create proxy-net 2>/dev/null || echo "Red ya existe"
+
+# 5. Verificar la configuración
 docker compose config
 
-# 3. Levantar contenedores
+# 6. Recrear contenedores
+docker compose down
 docker compose up -d
 
-# 4. Verificar estado
+# 7. Verificar estado (esperar ~50 segundos)
+echo "Esperando 60 segundos para health checks..."
+sleep 60
 docker compose ps
+
+# 8. Verificar health checks individuales
+echo "=== Health Check Status ==="
+docker inspect --format='{{.State.Health.Status}}' nexasys-db
+docker inspect --format='{{.State.Health.Status}}' nexasys-backend
+docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
+
+# 9. Verificar logs de inicio
+echo "=== Logs de inicio ==="
+docker logs --tail 30 nexasys-backend 2>&1 | grep -E "\[BACKEND\]"
 ```
 
 ### 📋 Resultado Esperado
 
-Deberías ver los 3 contenedores ejecutándose:
-
+```bash
+$ docker compose ps
+NAME                STATUS          PORTS
+nexasys-db          Up (healthy)    5432/tcp
+nexasys-backend     Up (healthy)    0.0.0.0:5001->5000/tcp
+nexasys-frontend    Up (healthy)    0.0.0.0:8080->80/tcp
 ```
-NAME                STATUS    PORTS
-nexasys-db          Up        5432/tcp
-nexasys-backend     Up        0.0.0.0:5001->5000/tcp
-nexasys-frontend    Up        0.0.0.0:8080->80/tcp
-```
 
-### ✅ Verificación de Health Checks
+### 📋 Verificación de Endpoints
 
 ```bash
-# Backend
-docker inspect --format='{{.State.Health.Status}}' nexasys-backend
-# Expected: healthy
+# Database
+docker exec -it nexasys-db pg_isready -U nexa_admin -d nexasys_crm
+# Expected: postgres:5432 - accepting connections
 
-# Frontend
-docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
-# Expected: healthy
+# Backend
+curl http://localhost:5001/health
+# Expected: OK
+
+# Frontend - Health check (independiente del backend)
+curl http://localhost:8080/health
+# Expected: OK
+
+# Frontend - API (sí depende del backend)
+curl http://localhost:8080/api/projects
+# Expected: JSON response (a través de proxy_pass)
 ```
 
-### 📋 Todas las Correcciones del BUG-043 Implementadas
+### 📋 Acciones Completadas
 
-| Corrección | Estado |
-|------------|--------|
-| Healthcheck Frontend (`/health` → `/`) | ✅ Implementado |
-| Healthcheck Backend (start_period: 10s → 30s) | ✅ Implementado |
-| Timeouts aumentados (3s → 5s) | ✅ Implementado |
-| Red `proxy-net` (external → internal) | ✅ Implementado |
+| Prioridad | Acción | Estado |
+|-----------|--------|--------|
+| 🔴 CRÍTICA | Frontend healthcheck: `/` → `/health` | ✅ Implementado |
+| 🔴 CRÍTICA | Interval reducido: 30s → 10s | ✅ Implementado |
+| 🔴 CRÍTICA | Red proxy-net: external → internal | ✅ Implementado |
+| 🔴 CRÍTICA | Console logs en backend | ✅ Implementado |
 
 ### 🎯 Criterios de Aceptación
 
@@ -504,9 +579,11 @@ docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 | Contenedor nexasys-db se crea y está healthy | ⏳ Pendiente |
 | Contenedor nexasys-backend se crea y está healthy | ⏳ Pendiente |
 | Contenedor nexasys-frontend se crea y está healthy | ⏳ Pendiente |
-| Frontend responde en http://servidor:8080 | ⏳ Pendiente |
-| Backend responde en http://servidor:5001/api | ⏳ Pendiente |
+| Frontend /health responde inmediatamente (sin esperar backend) | ⏳ Pendiente |
+| Frontend /api responde a través de proxy_pass | ⏳ Pendiente |
 | Smoke test pasa con exit code 0 | ⏳ Pendiente |
+| Tiempo total de inicio ≤ 60 segundos | ⏳ Pendiente |
+| Console logs [BACKEND] visibles en logs | ⏳ Pendiente |
 
 ---
 
@@ -667,7 +744,7 @@ Al crear stack en Portainer:
 
 | ID | Severidad | Tipo | Estado | Descripción |
 |----|-----------|------|--------|-------------|
-| BUG-043 | 🔴 CRÍTICA | CI/CD | ABIERTO | Docker Compose Smoke Test timeout (exit 124) |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **REQUIERE CORRECCIÓN** | Nueva arquitectura - Health checks independientes |
 | BUG-044 | 🔴 CRÍTICA | Deployment | ABIERTO | init.sql tratado como directorio en servidor |
 
 ---
@@ -958,7 +1035,7 @@ docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, usernam
 
 | ID | Severidad | Tipo | Estado | Descripción |
 |----|-----------|------|--------|-------------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** | Error red externa `proxy-net` - cambiada a interna |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | ✅ **IMPLEMENTADO** | Health checks independientes - `/health` nativo nginx |
 | **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO | init.sql tratado como directorio en servidor |
 | **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** | Error 500 en GET /api/users |
 
@@ -1048,5 +1125,5 @@ docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 **Firmado:** @QA-Auditor-Agent
 **Implementado por:** @DevOps-Agent
 **Fecha:** 2026-01-07
-**Estado:** 🔴 **BUG-043 IMPLEMENTADO - ESPERANDO VALIDACIÓN EN SERVIDOR**
+**Estado:** 🔴 **BUG-043 REQUIERE NUEVA ARQUITECTURA - Health Checks Independientes**
 **BUG-044:** ✅ Resuelto | **BUG-045:** ✅ Verificado

@@ -92,11 +92,22 @@ app.use((err, req, res, next) => {
 
 const startServer = async () => {
     try {
+        // Console logs para depuración (BUG-043)
+        console.log('[BACKEND] =========================================');
+        console.log('[BACKEND] NEXA-Sys V.02 CRM - Backend Server');
+        console.log('[BACKEND] =========================================');
+        console.log('[BACKEND] Starting initialization...');
+
         // Initialize database connection
+        console.log('[BACKEND] Attempting database connection...');
         await initializeDatabase();
+        console.log('[BACKEND] Database connected successfully');
 
         // Start server
         app.listen(PORT, () => {
+            console.log('[BACKEND] Server listening on port 5000');
+            console.log('[BACKEND] /health endpoint ready');
+            console.log('[BACKEND] Environment:', process.env.NODE_ENV);
             console.log(`========================================`);
             console.log(`✅ NEXA-Sys Backend Server RUNNING`);
             console.log(`📡 Port: ${PORT}`);
@@ -107,7 +118,7 @@ const startServer = async () => {
             console.log(`========================================`);
         });
     } catch (error) {
-        console.error('Failed to start server:', error);
+        console.error('[BACKEND] Failed to start server:', error);
         process.exit(1);
     }
 };
