@@ -12,17 +12,23 @@ const { getPool, isUsingDatabase, getInMemoryData } = require('../config/databas
  */
 router.get('/', authenticateToken, isAdminOrManager, async (req, res) => {
     try {
-        let query = 'SELECT id, username, email, role, active FROM users ORDER BY created_at DESC';
-        let queryParams = [];
-
         if (isUsingDatabase()) {
             const pool = getPool();
 
+            let query = `
+                SELECT u.id, u.username, u.email, u.active, r.name as role
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+            `;
+            let queryParams = [];
+
             // Filter: Managers can only see role='user'
             if (req.user.role === 'manager') {
-                query = 'SELECT id, username, email, role, active FROM users WHERE role = $1 ORDER BY created_at DESC';
+                query += ' WHERE r.name = $1';
                 queryParams = ['user'];
             }
+
+            query += ' ORDER BY u.created_at DESC';
 
             const result = await pool.query(query, queryParams);
             res.json(result.rows);
@@ -53,9 +59,17 @@ router.post('/', authenticateToken, isAdmin, validateBody(createUserSchema), asy
 
         if (isUsingDatabase()) {
             const pool = getPool();
+
+            // Get role_id from role name
+            const roleResult = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
+            if (roleResult.rows.length === 0) {
+                return res.status(400).json({ message: 'Rol inválido' });
+            }
+            const roleId = roleResult.rows[0].id;
+
             const result = await pool.query(
-                'INSERT INTO users (username, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id',
-                [username, email, hashedPassword, role]
+                'INSERT INTO users (username, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING id',
+                [username, email, hashedPassword, roleId]
             );
             res.status(201).json({ message: 'Usuario creado exitosamente', id: result.rows[0].id });
         } else {
@@ -114,8 +128,13 @@ router.put('/:id', authenticateToken, isAdmin, validateBody(updateUserSchema), a
                 values.push(hashedPassword);
             }
             if (role !== undefined) {
-                updates.push(`role = $${paramIndex++}`);
-                values.push(role);
+                // Get role_id from role name
+                const roleResult = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
+                if (roleResult.rows.length === 0) {
+                    return res.status(400).json({ message: 'Rol inválido' });
+                }
+                updates.push(`role_id = $${paramIndex++}`);
+                values.push(roleResult.rows[0].id);
             }
             if (active !== undefined) {
                 updates.push(`active = $${paramIndex++}`);

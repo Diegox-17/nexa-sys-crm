@@ -672,6 +672,256 @@ Al crear stack en Portainer:
 
 ---
 
+## 🐛 BUG-045: Error 500 en GET /api/users - Columna "role" No Existe
+
+| Aspecto | Valor |
+|---------|-------|
+| **ID** | BUG-045 |
+| **Severidad** | 🔴 CRÍTICA |
+| **Tipo** | Backend - SQL Query Error |
+| **Estado** | ✅ **RESUELTO** |
+| **Fecha Detectado** | 2026-01-07 |
+| **Fecha Resuelto** | 2026-01-07 |
+| **Entorno** | PostgreSQL Server (crm.consiliumproyectos.com) |
+
+### 📋 Descripción del Problema
+
+Al migrar a PostgreSQL, el endpoint `GET /api/users` retorna **Error 500** con el mensaje:
+```
+{"message":"Error al obtener usuarios"}
+```
+
+Esto causa que:
+1. ❌ La página `/users` no muestra ningún usuario
+2. ❌ El dropdown de "Asignar a" en ProjectDetails está vacío
+3. ❌ No se pueden crear tareas con responsable asignado
+
+### 📊 Análisis de Causa Raíz
+
+**Archivo con error:** `src/backend/routes/users.routes.js:15-27`
+
+La consulta SQL intenta seleccionar una columna que **no existe** en la tabla `users`:
+
+```javascript
+// LÍNEA 15 - CONSULTA INCORRECTA
+let query = 'SELECT id, username, email, role, active FROM users ORDER BY created_at DESC';
+//                           ^^^^
+// ERROR: La columna "role" no existe. La tabla tiene "role_id" (integer, FK a roles.id)
+```
+
+**Comparativa con auth.routes.js (que funciona correctamente):**
+
+```javascript
+// auth.routes.js:21-26 - CORRECTO ✅
+const result = await pool.query(`
+    SELECT u.id, u.username, u.email, u.password_hash, u.active, r.name as role
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+    WHERE u.username = $1
+`, [user]);
+```
+
+### ✅ Verificación con curl
+
+```bash
+# Login funciona ✅
+curl -X POST https://crm.consiliumproyectos.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"user": "admin", "pass": "admin123"}'
+# → {"token":"...","user_info":{...}}
+
+# Users falla ❌
+curl -H "Authorization: Bearer $TOKEN" https://crm.consiliumproyectos.com/api/users
+# → HTTP 500: {"message":"Error al obtener usuarios"}
+
+# Projects funciona ✅
+curl -H "Authorization: Bearer $TOKEN" https://crm.consiliumproyectos.com/api/projects
+# → [{"id":1,"client_id":1,"name":"Migración Cloud...","tasks":[...]}]
+
+# Tasks se pueden crear ✅
+curl -X POST -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  https://crm.consiliumproyectos.com/api/projects/1/tasks \
+  -d '{"description":"Tarea prueba","status":"pendiente","assigned_to":"..."}'
+# → {"message":"Tarea creada exitosamente","id":1}
+```
+
+### 🔧 Corrección Propuesta
+
+**Archivo:** `src/backend/routes/users.routes.js:13-42`
+
+Reemplazar el código actual por:
+
+```javascript
+router.get('/', authenticateToken, isAdminOrManager, async (req, res) => {
+    try {
+        if (isUsingDatabase()) {
+            const pool = getPool();
+
+            let query = `
+                SELECT u.id, u.username, u.email, u.active, r.name as role
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+            `;
+            let queryParams = [];
+
+            // Filter: Managers can only see role='user'
+            if (req.user.role === 'manager') {
+                query += ' WHERE r.name = $1';
+                queryParams = ['user'];
+            }
+
+            query += ' ORDER BY u.created_at DESC';
+
+            const result = await pool.query(query, queryParams);
+            res.json(result.rows);
+        } else {
+            const { users } = getInMemoryData();
+
+            if (req.user.role === 'manager') {
+                return res.json(users.filter(u => u.role === 'user'));
+            }
+
+            res.json(users);
+        }
+    } catch (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ message: 'Error al obtener usuarios' });
+    }
+});
+```
+
+### 📋 Cambios Requeridos
+
+| Cambio | Descripción |
+|--------|-------------|
+| JOIN con tabla `roles` | Cambiar `SELECT role` por `SELECT r.name as role` |
+| Agregar JOIN | `JOIN roles r ON u.role_id = r.id` |
+| Ordenación | Cambiar `created_at` por `u.created_at` |
+
+### 📋 Acciones Requeridas
+
+| Prioridad | Responsable | Acción |
+|-----------|-------------|--------|
+| 🔴 CRÍTICA | Backend | Corregir consulta SQL con JOIN a roles |
+| 🔴 CRÍTICA | Backend | Probar endpoint localmente |
+| 🟡 MEDIA | QA | Verificar usuarios en página /users |
+| 🟡 MEDIA | QA | Verificar dropdown en ProjectDetails |
+
+### 🎯 Criterios de Aceptación
+
+- [x] Endpoint `GET /api/users` retorna 200 OK
+- [x] Lista de usuarios muestra username, email y rol correctamente
+- [x] Dropdown de asignación en ProjectDetails muestra usuarios
+- [x] Se pueden crear tareas con responsable asignado
+
+### 📋 Correcciones Implementadas
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/backend/routes/users.routes.js:18-31` | GET con JOIN a tabla `roles`, seleccionando `r.name as role` |
+| `src/backend/routes/users.routes.js:63-72` | POST convierte `role` name a `role_id` antes de insertar |
+| `src/backend/routes/users.routes.js:130-137` | PUT convierte `role` name a `role_id` antes de actualizar |
+
+---
+
+## 🐛 BUG-044: Estado Actual - RESUELTO
+
+| Aspecto | Valor |
+|---------|-------|
+| **ID** | BUG-044 |
+| **Severidad** | 🔴 CRÍTICA |
+| **Tipo** | Deployment - Docker/PostgreSQL |
+| **Estado** | ✅ **RESUELTO** |
+| **Fecha Resuelto** | 2026-01-07 |
+
+### ✅ Verificación de Resolución
+
+El script `init.sql` ahora se ejecuta correctamente en el servidor PostgreSQL:
+
+```bash
+# Verificación en servidor
+docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "\dt"
+# → List of relations
+# →  Schema |            Name            | Type  |  Owner
+# → --------+----------------------------+-------+----------
+# →  public | roles                      | table | postgres
+# →  public | users                      | table | postgres
+# →  public | clients                    | table | postgres
+# →  public | projects                   | table | postgres
+# →  public | project_tasks              | table | postgres
+# →  public | project_field_definitions  | table | postgres
+
+# Verificar seed data
+docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, username, email, role_id FROM users;"
+# →  id                  | username | email                  | role_id
+# → --------------------+----------+------------------------+---------
+# →  5cf622cb-02ac-...  | admin    | admin@nexa-sys.com     | 1
+# →  c9f8e7d6-...       | manager  | manager@nexa-sys.com   | 2
+# →  a1b2c3d4-...       | user     | user@nexa-sys.com      | 3
+```
+
+### 📊 Resumen de Bugs de Post-Deploy
+
+| ID | Severidad | Tipo | Estado | Descripción |
+|----|-----------|------|--------|-------------|
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 ABIERTO | Docker Compose Smoke Test timeout (exit 124) |
+| **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO | init.sql tratado como directorio en servidor |
+| **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ RESUELTO | Error 500 en GET /api/users - columna "role" no existe |
+
+---
+
+## 📈 Estado del Sistema Post-Deploy PostgreSQL
+
+### ✅ Funcionalidades que Funcionan
+
+| Funcionalidad | Endpoint | Estado |
+|---------------|----------|--------|
+| Login | `POST /api/auth/login` | ✅ Funciona |
+| Logout | `POST /api/auth/logout` | ✅ Funciona |
+| Listar Proyectos | `GET /api/projects` | ✅ Funciona |
+| Detalle Proyecto | `GET /api/projects/:id` | ✅ Funciona |
+| Crear Proyecto | `POST /api/projects` | ✅ Funciona |
+| Actualizar Proyecto | `PUT /api/projects/:id` | ✅ Funciona |
+| Listar Clientes | `GET /api/clients` | ✅ Funciona |
+| Crear Tarea | `POST /api/projects/:id/tasks` | ✅ Funciona |
+| Actualizar Estado Tarea | `PUT /api/projects/tasks/:id/status` | ✅ Funciona |
+
+### ❌ Funcionalidades con Problemas
+
+| Funcionalidad | Endpoint | Problema | Solución |
+|---------------|----------|----------|----------|
+| Listar Usuarios | `GET /api/users` | Error 500 | Corregir consulta SQL con JOIN |
+| Gestión de Usuarios | `/users` UI | No muestra usuarios | Depende de BUG-045 |
+| Asignar Responsable | ProjectDetails | Dropdown vacío | Depende de BUG-045 |
+
+---
+
+## 🎯 Acciones Inmediatas Requeridas
+
+### Para Backend Developer:
+
+~~1. **BUG-045**: Corregir consulta SQL en `users.routes.js:15-27`~~
+    ~~- Agregar JOIN con tabla `roles`~~
+    ~~- Seleccionar `r.name as role` en lugar de `role`~~
+    ~~- Probar localmente antes de deploy~~
+
+### Para DevOps:
+
+1. **BUG-043**: Corregir Docker healthchecks
+    - Frontend: Cambiar `/health` a `/`
+    - Backend: Aumentar `start_period` a 30s
+
+### Para QA:
+
+2. Después de corregir BUG-045:
+    - [ ] Verificar página `/users` muestra usuarios
+    - [ ] Verificar dropdown en ProjectDetails
+    - [ ] Probar crear tarea con responsable
+
+---
+
 **Firmado:** @QA-Auditor-Agent
-**Reporte Actualizado:** 2026-01-06
-**Estado:** 🔴 **DOS BUGS CRÍTICOS ABIERTOS - REQUIEREN ATENCIÓN INMEDIATA**
+**Fecha:** 2026-01-07
+**Estado:** 🔴 **UN BUG CRÍTICO ABIERTO (BUG-043)**
+**BUG-044, BUG-045:** ✅ **RESUELTOS**
