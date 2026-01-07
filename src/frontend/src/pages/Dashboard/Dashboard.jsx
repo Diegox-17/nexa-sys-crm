@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
 import { projectsAPI } from '../../services/api';
+import Sidebar from '../../components/Sidebar';
 import './Dashboard.css';
 
 const Dashboard = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const [stats, setStats] = useState({
         total_cl: 0,
         pending_tasks: 0,
         tasks_to_approve: 0
     });
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -68,39 +68,18 @@ const Dashboard = () => {
         fetchStats();
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
-
     return (
         <div className="layout">
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <img src="/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys" />
-                </div>
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" className="nav-item active">Panel</Link>
-                    <Link to="/clients" className="nav-item">Clientes</Link>
-                    <Link to="/projects" className="nav-item">Proyectos</Link>
-                    {(user?.role === 'admin' || user?.role === 'manager') && (
-                        <Link to="/users" className="nav-item">Gestión de Usuarios</Link>
-                    )}
-                </nav>
-                <div className="sidebar-footer">
-                    <button onClick={handleLogout} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {(user?.role || 'UNKNOWN').toUpperCase()}<br />
-                        SEC_LEVEL: 1
-                    </div>
-                </div>
-            </aside>
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
 
             <header className="topbar">
                 <div className="breadcrumbs">SISTEMA / USUARIO / DASHBOARD</div>
                 <div className="user-menu">
                     <span>{user?.username}</span>
-                    <div className="avatar">{user?.username.substring(0, 2).toUpperCase()}</div>
+                    <div className="avatar">{user?.username?.substring(0, 2).toUpperCase()}</div>
                 </div>
             </header>
 

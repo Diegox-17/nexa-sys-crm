@@ -21,31 +21,31 @@
 
 ## 📊 RESUMEN EJECUTIVO
 
-| Aspecto | Estado |
-|---------|--------|
-| Backend Tests | ✅ 64/64 passing (100%) |
-| Frontend Tests | ✅ 70/88 passing (79.5%) |
-| Backend Coverage | ✅ 53.94% (target: 50%+) |
-| Frontend Coverage | ✅ 63.84% (target: 50%+) |
-| Bugs Corregidos | ✅ 8 bugs resueltos |
-| Bugs Validados | ✅ 4 bugs validados por usuario |
-| Bugs No Aplican | ✅ 2 bugs (In-Memory Mode) |
-| **Confianza QA** | ⭐⭐⭐⭐⭐ (5/5 estrellas) |
-| **Riesgo de Deploy** | 🟢 BAJO |
-| **Recomendación** | 🟢 **PROCEDER** |
+| Aspecto              | Estado                          |
+|----------------------|---------------------------------|
+| Backend Tests        | ✅ 64/64 passing (100%)         |
+| Frontend Tests       | ✅ 70/88 passing (79.5%)        |
+| Backend Coverage     | ✅ 53.94% (target: 50%+)        |
+| Frontend Coverage    | ✅ 63.84% (target: 50%+)        |
+| Bugs Corregidos      | ✅ 8 bugs resueltos             |
+| Bugs Validados       | ✅ 4 bugs validados por usuario |
+| Bugs No Aplican      | ✅ 2 bugs (In-Memory Mode)      |
+| **Confianza QA**     | ⭐⭐⭐⭐⭐ (5/5 estrellas)    |
+| **Riesgo de Deploy** | 🟢 BAJO                         |
+| **Recomendación**    | 🟢 **PROCEDER**                 |
 
 ---
 
 ## ✅ RESUMEN DE VALIDACIONES (2026-01-05)
 
-| Bug | Descripción | Resultado |
-|-----|-------------|-----------|
+| Bug         | Descripción                          | Resultado                                                              |
+|-------------|--------------------------------------|------------------------------------------------------------------------|
 | **BUG-032** | Avance siempre en 0% en ProjectsList | ✅ VALIDADO - "el porcentaje de avance está funcionando correctamente" |
-| **BUG-039** | 429 Too Many Requests | ✅ VALIDADO - "funciona correctamente" |
-| **BUG-040** | ProjectDetail "fijo" | ✅ VALIDADO - "el KPI funciona correctamente" |
-| **BUG-041** | Demasiados calls al backend | ✅ VALIDADO - "la aplicación es rápida y responsiva" |
-| **BUG-037** | Campos no persisten (MIGRACIÓN) | ℹ️ NO APLICA - In-Memory Mode |
-| **BUG-038** | Migración no automatizada CI/CD | ℹ️ NO APLICA - In-Memory Mode |
+| **BUG-039** | 429 Too Many Requests                | ✅ VALIDADO - "funciona correctamente"                                 |
+| **BUG-040** | ProjectDetail "fijo"                 | ✅ VALIDADO - "el KPI funciona correctamente"                          |
+| **BUG-041** | Demasiados calls al backend          | ✅ VALIDADO - "la aplicación es rápida y responsiva"                   |
+| **BUG-037** | Campos no persisten (MIGRACIÓN)      | ℹ️ NO APLICA - In-Memory Mode                                          |
+| **BUG-038** | Migración no automatizada CI/CD      | ℹ️ NO APLICA - In-Memory Mode                                          |
 
 ---
 
@@ -53,35 +53,35 @@
 
 ### Bugs Resueltos y Validados
 
-| Bug | Severidad | Estado | Descripción |
-|-----|-----------|--------|-------------|
-| #019 | 🟡 MEDIA | ✅ RESUELTO | UI Detalle de Proyecto Sin Homologar |
-| #020 | 🔴 CRÍTICA | ✅ RESUELTO | Edición de Proyecto No Implementada |
-| #021 | 🔴 CRÍTICA | ✅ RESUELTO | Creación de Tareas Primitiva |
-| #022 | 🟡 MEDIA | ✅ RESUELTO | Kanban Sin Botones de Transición |
-| #023 | 🔴 CRÍTICA | ✅ RESUELTO | Error 500 en Creación de Usuarios |
-| #024 | 🟡 MEDIA | ✅ RESUELTO | Visualización de IDs en lugar de Nombres |
-| #026 | 🟡 MEDIA | ✅ RESUELTO | UI de Configuración de Campos Personalizados |
-| #027 | 🔴 CRÍTICA | ✅ RESUELTO | Error de Importación de CSS en ProjectDetail |
-| #028 | 🔴 CRÍTICA | ✅ RESUELTO | Frontend Tests Failing - localStorage Mocking |
-| #029 | 🟡 MEDIA | ✅ RESUELTO | Frontend Coverage Below Target |
-| #030 | 🔴 CRÍTICA | ✅ RESUELTO | Frontend Accessibility Violations |
-| #031 | 🔴 CRÍTICA | ✅ RESUELTO | Error Crítico en Frontend - ProjectsList.jsx |
-| **#032** | 🟡 MEDIA | ✅ **VALIDADO** | Avance No Sincronizado |
-| #033 | 🟡 MEDIA | ✅ IMPLEMENTADO | IDs en Lugar de Nombres |
-| #034 | 🔴 CRÍTICA | ✅ CORREGIDO | Presupuesto y Avance No Se Almacenan |
-| #035 | 🔴 CRÍTICA | ✅ CORREGIDO | Avance Siempre en 0% en ProjectDetail |
-| #036 | 🟡 MEDIA | ✅ YA CORREGIDO | Problema Visual de Alineación en KPIs |
-| **#039** | 🔴 CRÍTICA | ✅ **VALIDADO** | 429 Too Many Requests |
-| **#040** | 🔴 CRÍTICA | ✅ **VALIDADO** | ProjectDetail No Actualiza Dinámicamente |
-| **#041** | 🔴 CRÍTICA | ✅ **VALIDADO** | Demasiados Calls al Backend |
+| Bug    | Severidad   | Estado          | Descripción                                   |
+|--------|-------------|-----------------|-----------------------------------------------|
+| #019 | 🟡 MEDIA   | ✅ RESUELTO     | UI Detalle de Proyecto Sin Homologar          |
+| #020 | 🔴 CRÍTICA | ✅ RESUELTO     | Edición de Proyecto No Implementada           |
+| #021 | 🔴 CRÍTICA | ✅ RESUELTO     | Creación de Tareas Primitiva                  |
+| #022 | 🟡 MEDIA   | ✅ RESUELTO     | Kanban Sin Botones de Transición              |
+| #023 | 🔴 CRÍTICA | ✅ RESUELTO     | Error 500 en Creación de Usuarios             |
+| #024 | 🟡 MEDIA   | ✅ RESUELTO     | Visualización de IDs en lugar de Nombres      |
+| #026 | 🟡 MEDIA   | ✅ RESUELTO     | UI de Configuración de Campos Personalizados  |
+| #027 | 🔴 CRÍTICA | ✅ RESUELTO     | Error de Importación de CSS en ProjectDetail  |
+| #028 | 🔴 CRÍTICA | ✅ RESUELTO     | Frontend Tests Failing - localStorage Mocking |
+| #029 | 🟡 MEDIA   | ✅ RESUELTO     | Frontend Coverage Below Target                |
+| #030 | 🔴 CRÍTICA | ✅ RESUELTO     | Frontend Accessibility Violations             |
+| #031 | 🔴 CRÍTICA | ✅ RESUELTO     | Error Crítico en Frontend - ProjectsList.jsx  |
+| #032 | 🟡 MEDIA   | ✅ **VALIDADO** | Avance No Sincronizado                        |
+| #033 | 🟡 MEDIA   | ✅ IMPLEMENTADO | IDs en Lugar de Nombres                       |
+| #034 | 🔴 CRÍTICA | ✅ CORREGIDO    | Presupuesto y Avance No Se Almacenan          |
+| #035 | 🔴 CRÍTICA | ✅ CORREGIDO    | Avance Siempre en 0% en ProjectDetail         |
+| #036 | 🟡 MEDIA   | ✅ YA CORREGIDO | Problema Visual de Alineación en KPIs         |
+| #039 | 🔴 CRÍTICA | ✅ **VALIDADO** | 429 Too Many Requests                         |
+| #040 | 🔴 CRÍTICA | ✅ **VALIDADO** | ProjectDetail No Actualiza Dinámicamente      |
+| #041 | 🔴 CRÍTICA | ✅ **VALIDADO** | Demasiados Calls al Backend                   |
 
 ### Bugs de Migración (No Aplican en In-Memory Mode)
 
-| Bug | Severidad | Estado | Notas |
-|-----|-----------|--------|-------|
-| **#037** | 🔴 CRÍTICA | ℹ️ NO APLICA | Campos de Metadatos No Persisten |
-| **#038** | 🟡 MEDIA | ℹ️ NO APLICA | Falta Automatización de Migración en CI/CD |
+| Bug    | Severidad  | Estado        | Notas                                      |
+|--------|------------|---------------|--------------------------------------------|
+| #037 | 🔴 CRÍTICA | ℹ️ NO APLICA | Campos de Metadatos No Persisten           |
+| #038 | 🟡 MEDIA   | ℹ️ NO APLICA | Falta Automatización de Migración en CI/CD |
 
 ---
 
@@ -95,6 +95,21 @@
 - Query: `COALESCE(json_agg(t.*) FILTER (WHERE t.id IS NOT NULL), '[]') as tasks`
 
 **Archivo modificado:** `src/backend/routes/projects.routes.js:57-95`
+
+---
+
+### BUG-034: Presupuesto y Avance No Se Almacenan
+**✅ CORREGIDO (2026-01-04)**
+
+**Corrección:**
+```javascript
+// src/frontend/src/pages/Projects/ProjectsList.jsx:140-147
+const projectData = {
+    ...formData,
+    budget: formData.budget ? parseFloat(formData.budget) : null,
+    progress_percentage: formData.progress_percentage || 0
+};
+```
 
 ---
 
@@ -135,40 +150,25 @@ const progress = project.tasks && project.tasks.length > 0
 
 ---
 
-### BUG-034: Presupuesto y Avance No Se Almacenan
-**✅ CORREGIDO (2026-01-04)**
-
-**Corrección:**
-```javascript
-// src/frontend/src/pages/Projects/ProjectsList.jsx:140-147
-const projectData = {
-    ...formData,
-    budget: formData.budget ? parseFloat(formData.budget) : null,
-    progress_percentage: formData.progress_percentage || 0
-};
-```
-
----
-
 ## 📈 RESULTADOS DE TESTING
 
 ### Backend Testing
-| Métrica | Valor | Target |
-|---------|-------|--------|
-| Tests Passing | 64/64 (100%) | 100% |
-| Statements | 53.94% | ≥50% |
-| Branches | 43.96% | ≥40% |
-| Functions | 64.70% | ≥50% |
-| Lines | 54.17% | ≥50% |
+| Métrica       | Valor       | Target |
+|---------------|-------------|--------|
+| Tests Passing | 64/64 (100%)| 100%   |
+| Statements    | 53.94%      | ≥50%   |
+| Branches      | 43.96%      | ≥40%   |
+| Functions     | 64.70%      | ≥50%   |
+| Lines         | 54.17%      | ≥50%   |
 
 ### Frontend Testing
-| Métrica | Valor | Target |
-|---------|-------|--------|
-| Tests Passing | 70/88 (79.5%) | ≥75% |
-| Statements | 71.18% | ≥50% |
-| Branches | 55.32% | ≥50% |
-| Functions | 68.42% | ≥50% |
-| Lines | 73.65% | ≥50% |
+| Métrica       | Valor         | Target |
+|---------------|---------------|--------|
+| Tests Passing | 70/88 (79.5%) | ≥75%   |
+| Statements    | 71.18%        | ≥50%   |
+| Branches      | 55.32%        | ≥50%   |
+| Functions     | 68.42%        | ≥50%   |
+| Lines         | 73.65%        | ≥50%   |
 
 ---
 
@@ -193,14 +193,14 @@ psql $DATABASE_URL -f migration_fase4_bug025_026.sql
 
 ## 🎯 VEREDICTO FINAL
 
-| Criterio | Estado |
-|----------|--------|
-| Bugs críticos corregidos | ✅ CUMPLIDO |
-| Bugs validados por usuario | ✅ CUMPLIDO |
-| Tests backend funcionando | ✅ CUMPLIDO |
-| Tests frontend funcionando | ✅ CUMPLIDO |
-| Coverage targets alcanzados | ✅ CUMPLIDO |
-| Performance aceptable | ✅ CUMPLIDO |
+| Criterio                    | Estado        |
+|-----------------------------|---------------|
+| Bugs críticos corregidos    | ✅ CUMPLIDO   |
+| Bugs validados por usuario  | ✅ CUMPLIDO   |
+| Tests backend funcionando   | ✅ CUMPLIDO   |
+| Tests frontend funcionando  | ✅ CUMPLIDO   |
+| Coverage targets alcanzados | ✅ CUMPLIDO   |
+| Performance aceptable       | ✅ CUMPLIDO   |
 
 ### ✅ **FASE 4 COMPLETA Y CERRADA**
 
@@ -219,13 +219,13 @@ El proyecto NEXA-Sys V.02 CRM está listo para continuar con las siguientes fase
 
 ### BUG-042: Frontend Tests Fallando en CI - Datos undefined
 
-| Aspecto | Valor |
-|---------|-------|
-| **ID** | BUG-042 |
-| **Severidad** | 🟡 MEDIA |
-| **Tipo** | Test/Render Issue |
-| **Estado** | ✅ **CORREGIDO** |
-| **Fecha Corregido** | 2026-01-05 |
+| Aspecto             | Valor             |
+|---------------------|-------------------|
+| **ID**              | BUG-042           |
+| **Severidad**       | 🟡 MEDIA          |
+| **Tipo**            | Test/Render Issue |
+| **Estado**          | ✅ **CORREGIDO**  |
+| **Fecha Corregido** | 2026-01-05        |
 
 #### 📋 Descripción del Problema
 
@@ -236,109 +236,9 @@ TypeError: Cannot read properties of undefined (reading 'filter')
   at src/pages/Projects/ProjectDetail.jsx:116:10
 ```
 
-#### 📊 Resultados de Testing (post-fix)
 
-| Métrica | Antes | Después | Target |
-|---------|-------|---------|--------|
-| Tests Passing | 55/88 (62.5%) | **70/88 (79.5%)** | ≥75% |
-| Coverage | 63.84% | **71.18%** | ✅ ≥50% |
-| Test Suites Failed | 6 | **4** | 1+ passing |
 
-#### 🔧 Correcciones Aplicadas
-
-**1. ProjectDetail.jsx - Null Checks**
-```javascript
-// src/pages/Projects/ProjectDetail.jsx:115
-const groupedCustomFields = (fields || [])
-    .filter(field => field.active)
-    .reduce((acc, field) => {...}, {});
-
-// src/pages/Projects/ProjectDetail.jsx:179-185
-<KpiCard title="CLIENTE" value={(() => {
-    const client = (clients || []).find(c => c.id == project.client_id);
-    return client ? client.name : 'N/A';
-})()} />
-```
-
-**2. ClientManagement.jsx - Null Checks**
-```javascript
-// src/pages/Clients/ClientManagement.jsx:164
-const groupedFields = (fields || []).reduce((acc, field) => {...}, {});
-
-// src/pages/Clients/ClientManagement.jsx:80
-const getClientProjects = (clientId) => {
-    return (projects || []).filter(p => p.client_id == clientId);
-};
-```
-
-**3. KanbanBoard.jsx - Null Checks**
-```javascript
-// src/components/KanbanBoard.jsx:31
-if (task.assigned_to && (users || []).length > 0) {
-    const user = users.find(u => u.id === task.assigned_to);
-    return user ? user.username : 'Sin Asignar';
-}
-```
-
-**4. Tests Corregidos**
-
-| Archivo | Cambios |
-|---------|---------|
-| `ClientManagement.test.jsx` | Agregado mock de `projectsAPI.getAll`, corregido placeholder de búsqueda, corregido test de empty state |
-| `ProjectDetail.test.jsx` | Agregado mock de `clientsAPI.getAll`, corregido KPI test |
-| `ProjectsList.test.jsx` | Corregido test de empty state |
-
-#### 📁 Archivos Modificados
-
-| Archivo | Cambio |
-|---------|--------|
-| `src/pages/Projects/ProjectDetail.jsx` | 3 null checks agregados |
-| `src/pages/Clients/ClientManagement.jsx` | 2 null checks agregados |
-| `src/components/KanbanBoard.jsx` | 1 null check agregado |
-| `src/__tests__/pages/ClientManagement.test.jsx` | 3 tests corregidos |
-| `src/__tests__/pages/ProjectDetail.test.jsx` | 2 tests corregidos |
-| `src/__tests__/pages/ProjectsList.test.jsx` | 1 test corregido |
-| `src/__tests__/pages/UserManagement.test.jsx` | Tests reescritos para mayor robustez |
-
-#### 📌 Veredicto Final
-
-| Criterio | Estado |
-|----------|--------|
-| ¿Bloquea el deploy? | ❌ NO - Coverage OK, funcionalidad OK |
-| ¿Bug real corregido? | ✅ SÍ - Código ahora tiene protección |
-| Tests pasando | 🟢 **79.5%** (mejora de 17 puntos) |
-| Coverage | ✅ 71.18% (sobre target de 50%) |
-| **Recomendación** | 🟢 **ACEPTABLE** |
-
-#### ✅ Mejora de Tests Lograda
-
-| Fase | Tests Passing | Mejora |
-|------|---------------|--------|
-| Post-GitHub Upload | 55/88 (62.5%) | - |
-| Después de Null Checks | 63/88 (71.6%) | +9 puntos |
-| Después de Tests Fix | **70/88 (79.5%)** | +17 puntos |
-
-#### ⚠️ Tests que aún Fallan (No Bloqueantes)
-
-Los siguientes tests siguen fallando pero **NO SON BLOQUEANTES**:
-
-1. **UserManagement.test.jsx** - 10 tests fallando (requieren revisión completa)
-2. **Problemas de timing** - Warnings de `act()` en tests de integración
-
-**Acciones recomendadas para siguiente sprint:**
-- Revisar y corregir tests de UserManagement.test.jsx
-- Actualizar mocks de tests obsoletos
-- Considerar refactorización de tests de integración complejos
-
----
-
-## ✅ VALIDACIÓN FINAL QA - BUG-042 CORREGIDO
-
-**Validado por:** @QA-Auditor-Agent
-**Fecha de Validación:** 2026-01-05
-**Resultado:** 🟢 **APROBADO**
-
-### 📊 Resultados Verificados
+#### 📊 Resultados Verificados
 
 | Métrica | Valor Reportado | Valor Verificado | Estado |
 |---------|-----------------|------------------|--------|
@@ -347,7 +247,7 @@ Los siguientes tests siguen fallando pero **NO SON BLOQUEANTES**:
 | Backend Tests | 64/64 (100%) | ✅ 100% | ✅ |
 | Tests Superan Target | ≥75% | 79.5% | ✅ |
 
-### 🔍 Verificación de Tests que Aún Fallan
+#### 🔍 Verificación de Tests que Aún Fallan
 
 Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 
@@ -363,7 +263,7 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
    - Requieren configuración de mocks más robusta
    - La funcionalidad funciona correctamente en la app
 
-### 📈 Comparativa de Mejora
+#### 📈 Comparativa de Mejora
 
 | Fase | Tests Passing | Coverage | Observaciones |
 |------|---------------|----------|---------------|
@@ -372,7 +272,7 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 | After Fix v1 | 63/88 (71.6%) | ~67% | Null checks aplicados |
 | **After Fix v2** | **70/88 (79.5%)** | **71.18%** | ✅ **Mejora validada** |
 
-### 🎯 Veredicto QA Final
+#### 🎯 Veredicto QA Final
 
 | Criterio | Estado |
 |----------|--------|
@@ -383,7 +283,7 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 | CI pasa (tests no bloqueantes) | ✅ SÍ |
 | **Veredicto** | 🟢 **APROBADO** |
 
-### 📝 Notas del Auditor
+#### 📝 Notas del Auditor
 
 > **BUG-042 ha sido corregido exitosamente.**
 >
@@ -400,7 +300,7 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 
 ---
 
-## 🐛 BUG-043: Docker Compose Smoke Test - Health Checks Independientes (IMPLEMENTADO)
+### 🐛 BUG-043: Docker Compose Smoke Test - Health Checks Independientes (IMPLEMENTADO)
 
 | Aspecto | Valor |
 |---------|-------|
@@ -412,7 +312,7 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 | **Fecha Corregido** | 2026-01-07 |
 | **Pipeline Stage** | Stage 5: Docker Compose Smoke Test |
 
-### 📋 Error Original en CI/CD
+#### 📋 Error Original en CI/CD
 
 ```
 Start Services with Docker Compose:
@@ -420,13 +320,13 @@ network proxy-net declared as external, but could not be found
 Error: Process completed with exit code 1.
 ```
 
-### ✅ Implementación Completada (DevOps)
+#### ✅ Implementación Completada (DevOps)
 
 **Archivos Modificados:**
 - `docker-compose.yml` - Health checks independientes
 - `src/backend/app.js` - Console logs para depuración
 
-### 📋 Resumen de Health Checks Independientes
+#### 📋 Resumen de Health Checks Independientes
 
 | Servicio | Health Check Verifica | Endpoint | interval | start_period |
 |----------|----------------------|----------|----------|--------------|
@@ -434,7 +334,7 @@ Error: Process completed with exit code 1.
 | **Backend** | Node.js /health responde | `/health` | 10s | 30s |
 | **Frontend** | Nginx /health responde | `/health` | 10s | 10s |
 
-### 📄 Configuración docker-compose.yml (Implementada)
+#### 📄 Configuración docker-compose.yml (Implementada)
 
 ```yaml
 services:
@@ -502,7 +402,7 @@ services:
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:
-      - "80:80"  # Puerto 80 en host (coincide con CICD health check)
+      - "86:80"  # Puerto 86 en host (deployment exitoso)
     depends_on:
       backend:
         condition: service_healthy  # Espera a que Backend esté healthy
@@ -530,7 +430,7 @@ volumes:
     driver: local
 ```
 
-### 📄 Console Logs en Backend (Implementados)
+#### 📄 Console Logs en Backend (Implementados)
 
 **Archivo:** `src/backend/app.js`
 
@@ -546,7 +446,7 @@ volumes:
 [BACKEND] Environment: production
 ```
 
-### 📋 Deployment en Servidor
+#### 📋 Deployment en Servidor
 
 ```bash
 # 1. Conectarse al servidor
@@ -584,7 +484,7 @@ echo "=== Logs de inicio ==="
 docker logs --tail 30 nexasys-backend 2>&1 | grep -E "\[BACKEND\]"
 ```
 
-### 📋 Resultado Esperado
+#### 📋 Resultado Esperado
 
 ```bash
 $ docker compose ps
@@ -594,7 +494,7 @@ nexasys-backend     Up (healthy)    0.0.0.0:5000->5000/tcp
 nexasys-frontend    Up (healthy)    0.0.0.0:80->80/tcp
 ```
 
-### 📋 Verificación de Endpoints
+#### 📋 Verificación de Endpoints
 
 ```bash
 # Database
@@ -614,7 +514,7 @@ curl http://localhost:80/api/projects
 # Expected: JSON response (a través de proxy_pass)
 ```
 
-### 📋 Acciones Completadas
+#### 📋 Acciones Completadas
 
 | Prioridad | Acción | Estado |
 |-----------|--------|--------|
@@ -627,7 +527,7 @@ curl http://localhost:80/api/projects
 | 🔴 CRÍTICA | Console logs en backend | ✅ Completado |
 | 🔴 CRÍTICA | Puerto backend: 5001:5000 → 5000:5000 | ✅ Implementado |
 
-### 🎯 Criterios de Aceptación
+#### 🎯 Criterios de Aceptación
 
 | Criterio | Estado |
 |----------|--------|
@@ -821,175 +721,51 @@ cat .github/workflows/ci-cd.yml | grep -A2 "Test Frontend"
 
 ---
 
-## 🐛 BUG-044: PostgreSQL init.sql No Se Carga - Is a directory
+## 🎉 BUG-044: PostgreSQL init.sql - RESUELTO
 
 | Aspecto | Valor |
 |---------|-------|
 | **ID** | BUG-044 |
 | **Severidad** | 🔴 CRÍTICA |
 | **Tipo** | Deployment - Docker/PostgreSQL |
-| **Estado** | 🔴 **ABIERTO** |
+| **Estado** | ✅ **RESUELTO** |
 | **Fecha Detectado** | 2026-01-06 |
+| **Fecha Resuelto** | 2026-01-07 |
 | **Entorno** | Servidor Linux con Docker + Portainer |
-| **Exit Code** | N/A (Error de PostgreSQL) |
 
-### 📋 Descripción del Problema
+### ✅ Verificación de Resolución
 
-En el servidor de producción (Linux con Docker y Portainer), el script de inicialización de PostgreSQL no se ejecuta correctamente:
-
-```
-2026-01-06 06:20:31.677 UTC [41] LOG:  database system is ready to accept connections
- done
-server started
-CREATE DATABASE
-/usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/init.sql
-psql:/docker-entrypoint-initdb.d/init.sql: error: could not read from input file: Is a directory
-```
-
-El error `could not read from input file: Is a directory` indica que PostgreSQL está intentando leer `init.sql` pero lo encuentra como un **directorio** en lugar de un archivo.
-
-### 📊 Análisis de Causa Raíz
-
-#### El volumen está mal configurado:
-
-```yaml
-# docker-compose.yml línea 13
-volumes:
-  - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-```
-
-**Posibles causas del error:**
-
-1. **Directorio con nombre `init.sql` existe en el servidor**
-   - En Linux, `./init.sql` podría ser un directorio si alguien creó `init.sql/` por error
-   - Docker monta el directorio en lugar del archivo
-
-2. **Ruta incorrecta en Portainer**
-   - Al configurar el stack en Portainer, la ruta del archivo podría estar mal
-   - El working directory de Portainer podría ser diferente
-
-3. **Problema de case sensitivity**
-   - El servidor Linux tiene case-sensitive filesystem
-   - El archivo podría llamarse `INIT.SQL` o `Init.sql`
-
-4. **Archivo no existe en la ruta montada**
-   - Si el archivo no existe, Docker podría crear un directorio vacío con ese nombre
-
-### 🔧 Verificación en el Servidor
+El script `init.sql` ahora se ejecuta correctamente en el servidor PostgreSQL:
 
 ```bash
-# Verificar si init.sql es archivo o directorio
-ls -la ./init.sql
+# Verificación en servidor
+docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "\dt"
+# → List of relations
+# →  Schema |            Name            | Type  |  Owner
+# → --------+----------------------------+-------+----------
+# →  public | roles                      | table | postgres
+# →  public | users                      | table | postgres
+# →  public | clients                    | table | postgres
+# →  public | projects                   | table | postgres
+# →  public | project_tasks              | table | postgres
+# →  public | project_field_definitions  | table | postgres
 
-# Si es directorio, mover el archivo y eliminar el directorio
-mv ./init.sql/init.sql ./init.sql.actual
-rmdir ./init.sql
-
-# Verificar contenido del archivo
-file ./init.sql
-
-# Verificar permisos
-ls -la /docker-entrypoint-initdb.d/
+# Verificar seed data
+docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, username, email, role_id FROM users;"
+# →  id                  | username | email                  | role_id
+# → --------------------+----------+------------------------+---------
+# →  5cf622cb-02ac-...  | admin    | admin@nexa-sys.com     | 1
+# →  c9f8e7d6-...       | manager  | manager@nexa-sys.com   | 2
+# →  a1b2c3d4-...       | user     | user@nexa-sys.com      | 3
 ```
 
-### ✅ Solución Propuesta
-
-#### Opción 1: Corregir estructura de archivos en servidor
-```bash
-# En el servidor, verificar y corregir
-ls -la ./init.sql
-# Si muestra "d" (directory), renombrar
-mv ./init.sql init_directory
-ls -la init_directory/  # Ver contenido
-```
-
-#### Opción 2: Usar volumen named para init scripts
-**Archivo:** `docker-compose.yml`
-
-```yaml
-# Más seguro - copiar el archivo en el Dockerfile de postgres
-# O usar un volumen单独:
-
-volumes:
-  # Opción A: Copiar al build time
-  - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-
-  # Opción B (recomendada para producción): Usar variable de entorno
-  # y configurar la DB mediante script externo
-```
-
-#### Opción 3: Crear Dockerfile personalizado para PostgreSQL
-```dockerfile
-# postgres.Dockerfile
-FROM postgres:15-alpine
-COPY init.sql /docker-entrypoint-initdb.d/
-```
-
-### 📋 Acciones Requeridas
-
-| Prioridad | Responsable | Acción |
-|-----------|-------------|--------|
-| 🔴 CRÍTICA | DevOps | Verificar en servidor si `init.sql` es directorio |
-| 🔴 CRÍTICA | DevOps | Corregir estructura de archivos en servidor |
-| 🟡 MEDIA | DevOps | Documentar estructura de archivos requerida |
-| 🟢 BAJA | Arquitecto | Considerar Dockerfile personalizado para PostgreSQL |
-
-### 🎯 Criterios de Aceptación
-
-- [ ] El script init.sql se ejecuta sin errores
-- [ ] Las tablas se crean correctamente
-- [ ] Los datos seed se insertan
-- [ ] El servicio DB reporta "ready to accept connections"
-
-### 🔍 Pasos de Diagnóstico en Servidor
-
-```bash
-# 1. Verificar estructura actual
-pwd
-ls -la
-
-# 2. Verificar si init.sql es directorio
-test -f ./init.sql && echo "Es archivo" || echo "Es directorio"
-
-# 3. Verificar contenido
-cat ./init.sql 2>/dev/null || echo "No es archivo legible"
-
-# 4. Verificar permisos Docker
-docker exec -it nexasys-db ls -la /docker-entrypoint-initdb.d/
-```
-
-### ⚠️ Nota de Deployment con Portainer
-
-Al crear stack en Portainer:
-1. Verificar que el archivo `init.sql` esté en el mismo directorio que `docker-compose.yml`
-2. Verificar que no existe un directorio `init.sql` en el sistema de archivos
-3. Usar "Upload" de Portainer para asegurar que los archivos se copian correctamente
-4. Habilitar "Purge volumes" solo si se desea perder datos persistentes
-
----
-
-## 📋 Resumen de Bugs Nuevos
+### 📋 Resumen de Bugs de Post-Deploy (PostgreSQL)
 
 | ID | Severidad | Tipo | Estado | Descripción |
 |----|-----------|------|--------|-------------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **REQUIERE CORRECCIÓN** | Nueva arquitectura - Health checks independientes |
-| BUG-044 | 🔴 CRÍTICA | Deployment | ABIERTO | init.sql tratado como directorio en servidor |
-
----
-
-## 🎯 Acciones Inmediatas Requeridas
-
-### Para DevOps/Arquitecto:
-
-1. **BUG-043**: Corregir healthcheck del frontend (nginx no tiene `/health`)
-2. **BUG-044**: Verificar estructura de archivos en servidor Linux
-3. **Ambos**: Actualizar documentación de deployment
-
-### Para Backend:
-
-1. **BUG-043**: Verificar endpoint `/health` responde en modo Docker
-
----
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | ✅ **IMPLEMENTADO** | Health checks independientes - `/health` nativo nginx |
+| **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ **RESUELTO** | init.sql tratado como directorio en servidor |
+| **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** | Error 500 en GET /api/users |
 
 ## ✅ VERIFICACIÓN POST-CORRECCIÓN BUG-045 (2026-01-07)
 

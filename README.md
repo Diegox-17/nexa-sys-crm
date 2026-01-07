@@ -2,12 +2,12 @@
 
 [![CI/CD Pipeline](https://github.com/yourusername/nexasys-crm/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yourusername/nexasys-crm/actions/workflows/ci-cd.yml)
 [![Backend Tests](https://img.shields.io/badge/backend_tests-64_passing-brightgreen)](./docs/05_backend_testing_infrastructure.md)
-[![Frontend Tests](https://img.shields.io/badge/frontend_tests-70_written-blue)](./docs/00_Agent_Status.md)
-[![Coverage](https://img.shields.io/badge/coverage-63.84%25-brightgreen)](./docs/05_backend_testing_infrastructure.md)
+[![Frontend Tests](https://img.shields.io/badge/frontend_tests-70%2F88_passing-blue)](./docs/00_Agent_Status.md)
+[![Coverage](https://img.shields.io/badge/coverage-71.18%25-brightgreen)](./docs/05_backend_testing_infrastructure.md)
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](./docker-compose.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-> **Estado:** v1.3.0-fase4.projects · [APROBADO por QA]
+> **Estado:** v1.4.0-fase4.completed · [APROBADO POR QA - FASE 4 CERRADA]
 
 ...
 
@@ -58,7 +58,7 @@ npm run dev
 # Backend tests (64 tests, 53.94% coverage)
 cd src/backend && npm test
 
-# Frontend tests (70/88 tests passing, 63.84% coverage)
+# Frontend tests (70/88 tests passing, 71.18% coverage)
 cd src/frontend && npm test
 
 # Run all tests from root

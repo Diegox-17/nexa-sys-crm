@@ -1,73 +1,5 @@
-.layout {
-    display: grid;
-    grid-template-columns: 260px 1fr;
-    grid-template-rows: 64px 1fr;
-    height: 100vh;
-}
-
-.sidebar {
-    grid-row: 1 / -1;
-    background: rgba(11, 30, 59, 0.4);
-    border-right: 1px solid var(--color-glass-border);
-    backdrop-filter: blur(20px);
-    display: flex;
-    flex-direction: column;
-    padding: var(--spacing-md);
-}
-
-.sidebar-brand img {
-    height: 32px;
-    margin-bottom: 2rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    color: var(--color-accent);
-    text-decoration: none;
-    border-radius: var(--border-radius);
-    margin-bottom: 4px;
-    font-size: 0.925rem;
-}
-
-.nav-item:hover,
-.nav-item.active {
-    background: rgba(0, 240, 255, 0.05);
-    color: var(--color-secondary);
-}
-
-.topbar {
-    grid-column: 2;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 var(--spacing-lg);
-    border-bottom: 1px solid var(--color-glass-border);
-}
-
-.user-menu {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.avatar {
-    width: 36px;
-    height: 36px;
-    background: var(--color-primary);
-    border: 1px solid var(--color-secondary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-secondary);
-}
-
-.main-content {
-    padding: var(--spacing-lg);
-    overflow-y: auto;
-}
+/* Dashboard Styles - Page-specific styles only */
+/* Note: Layout, Sidebar, Topbar, and MainContent styles are now in components/Sidebar.css */
 
 .profile-header {
     display: flex;
@@ -118,15 +50,15 @@
     font-weight: 700;
 }
 
-.btn-outline {
-    border: 1px solid var(--color-accent);
-    color: var(--color-accent);
-    padding: 0.5rem;
-    background: transparent;
-    cursor: pointer;
-}
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
 
-.btn-outline:hover {
-    border-color: var(--color-secondary);
-    color: var(--color-secondary);
+    .stat-grid {
+        grid-template-columns: 1fr;
+    }
 }

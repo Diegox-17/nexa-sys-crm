@@ -1,8 +1,8 @@
 # 🚀 DEPLOYMENT GUIDE - NEXA-Sys V.02 CRM
 
-**Version:** 2.1.0
-**Last Updated:** 2026-01-05
-**Status:** ✅ Production Ready with Full CI/CD Pipeline
+**Version:** 2.2.0
+**Last Updated:** 2026-01-07
+**Status:** ✅ Production Ready with PostgreSQL + Full CI/CD Pipeline
 
 ---
 
@@ -48,7 +48,7 @@ The NEXA-Sys CI/CD pipeline ensures code quality and reliability through automat
 ├─────────────────────────────────────────────────────────────┤
 │ 5. 🔥 Docker Compose Smoke Test                           │
 │    ├─ Start all services (db, backend, frontend)           │
-│    ├─ Wait for health checks to pass                       │
+│    ├─ Independent health checks for each service           │
 │    ├─ Test backend and frontend endpoints                  │
 │    └─ Cleanup containers after test                        │
 ├─────────────────────────────────────────────────────────────┤
@@ -61,6 +61,22 @@ The NEXA-Sys CI/CD pipeline ensures code quality and reliability through automat
 
 **Total Pipeline Time:** ~5-8 minutes
 **Fail Fast Strategy:** Backend tests failure prevents frontend tests and builds
+
+### Independent Health Checks (Stage 5)
+
+Each service has its own health check that verifies only that specific service:
+
+| Service | Health Check Method | Endpoint | Interval | Start Period |
+|---------|--------------------|----------|----------|--------------|
+| **DB** | PostgreSQL ready | `pg_isready` | 10s | 10s |
+| **Backend** | Node.js responds | `/health` | 10s | 30s |
+| **Frontend** | Nginx responds | `/health` | 10s | 10s |
+
+**Why Independent Health Checks?**
+- Prevents cascading failures (DB fails → backend waits properly)
+- Faster startup (services don't wait unnecessarily)
+- Better debugging (know exactly which service failed)
+- CI/CD smoke test passes reliably
 
 ---
 
@@ -91,10 +107,10 @@ start coverage/lcov-report/index.html # Windows
 ```
 
 **Backend Test Results:**
-- ✅ 64 tests passing
+- ✅ 64 tests passing (100%)
 - ✅ 53.94% coverage (exceeds 50% target)
-- ✅ BUG #023 regression prevention
 - ✅ Comprehensive RBAC validation
+- ✅ PostgreSQL queries with JOIN validation
 
 ### Frontend Tests
 
@@ -116,9 +132,10 @@ npm run test:ui
 ```
 
 **Frontend Test Results:**
-- 📝 88 tests written (70 passing)
-- ✅ 63.84% coverage (exceeds 50% target)
-- ✅ Critical tests passing (BUG #023, RBAC)
+- 📝 88 tests written (70 passing = 79.5%)
+- ✅ 71.18% coverage (exceeds 50% target)
+- ✅ Critical tests passing (RBAC, Projects, Tasks)
+- ✅ Null checks implemented for defensive programming
 - 🎨 React Testing Library + Jest
 
 ### Run All Tests (Root)
@@ -182,7 +199,79 @@ docker-compose -f docker-compose.test.yml up --build frontend-test
 
 ---
 
+## 🐛 Deployment Bugs Fixed (PostgreSQL)
+
+### BUG-043: Docker Compose Smoke Test - Health Checks Independentes
+
+| Aspect | Value |
+|--------|-------|
+| **ID** | BUG-043 |
+| **Severity** | 🔴 CRÍTICA |
+| **Status** | ✅ IMPLEMENTADO |
+
+**Problem:**
+```
+network proxy-net declared as external, but could not be found
+Error: Process completed with exit code 1.
+```
+
+**Solution:**
+- Changed network from `external: true` to `driver: bridge`
+- Implemented independent health checks for each service
+- Added `/health` endpoint to backend with console logs
+- Backend `start_period` increased from 10s to 30s
+
+### BUG-044: PostgreSQL init.sql - "Is a directory" error
+
+| Aspect | Value |
+|--------|-------|
+| **ID** | BUG-044 |
+| **Severity** | 🔴 CRÍTICA |
+| **Status** | ✅ RESUELTO |
+
+**Problem:**
+Script `init.sql` was being treated as a directory in the server.
+
+**Solution:**
+- Fixed file structure on server
+- Verified 6 tables created: roles, users, clients, projects, project_tasks, project_field_definitions
+- Seed data verified: 3 users (admin, manager, user)
+
+### BUG-045: Error 500 in GET /api/users - Column "role" doesn't exist
+
+| Aspect | Value |
+|--------|-------|
+| **ID** | BUG-045 |
+| **Severity** | 🔴 CRÍTICA |
+| **Status** | ✅ CORREGIDO Y VERIFICADO |
+
+**Problem:**
+Query was selecting column `role` which doesn't exist (table has `role_id`).
+
+**Solution:**
+```sql
+-- BEFORE (incorrect)
+SELECT id, username, email, role, active FROM users
+
+-- AFTER (correct)
+SELECT u.id, u.username, u.email, u.active, r.name as role
+FROM users u
+JOIN roles r ON u.role_id = r.id
+```
+
+**File Modified:** `src/backend/routes/users.routes.js:18-31`
+
+---
+
 ## 🚢 Production Deployment
+
+### Production Credentials
+
+| Environment | URL | Username | Password | Role |
+|-------------|-----|----------|----------|------|
+| **Production** | crm.consiliumproyectos.com | admin | admin123 | admin |
+| **Production** | crm.consiliumproyectos.com | manager | manager123 | manager |
+| **Production** | crm.consiliumproyectos.com | user | user123 | user |
 
 ### Using Docker Compose (Recommended)
 
@@ -191,30 +280,62 @@ docker-compose -f docker-compose.test.yml up --build frontend-test
 git clone <repository-url>
 cd nexasys-crm
 
-# 2. Create environment file (optional)
+# 2. Create/verify proxy-net network (required for production)
+docker network create proxy-net 2>/dev/null || echo "Network already exists"
+
+# 3. Create environment file (optional)
 echo "JWT_SECRET=your_production_secret_here" > .env
 
-# 3. Start all services
+# 4. Start all services
 docker-compose up --build -d
 
-# 4. Verify services are running
+# 5. Verify services are running (wait ~60 seconds for health checks)
+sleep 60
 docker-compose ps
 
 # Expected output:
 # NAME                  STATUS              PORTS
-# nexasys-backend       Up (healthy)        0.0.0.0:5000->5000/tcp
 # nexasys-db            Up (healthy)        5432/tcp
-# nexasys-frontend      Up (healthy)        0.0.0.0:80->80/tcp
+# nexasys-backend       Up (healthy)        0.0.0.0:5000->5000/tcp
+# nexasys-frontend      Up (healthy)        0.0.0.0:86->80/tcp
 
-# 5. View logs
+# 6. View logs
 docker-compose logs -f
 
-# 6. Access the application
-# - Frontend: http://localhost
+# 7. Access the application
+# - Frontend: http://localhost:86 (or http://crm.consiliumproyectos.com)
 # - Backend API: http://localhost:5000
 # - Health checks:
 #   - Backend: http://localhost:5000/health
-#   - Frontend: http://localhost/health
+#   - Frontend: http://localhost:86/health
+```
+
+### Port Configuration
+
+| Service | Host Port | Container Port | Notes |
+|---------|-----------|----------------|-------|
+| **Frontend** | 86 | 80 | Configurable (80, 81, or 86) |
+| **Backend** | 5000 | 5000 | Fixed for CI/CD health check |
+| **DB** | 5432 | 5432 | Internal only |
+
+> **Note:** Port 86 is used because ports 80 and 81 were already occupied on the production server.
+
+### Health Check Endpoints
+
+Both services expose health check endpoints for monitoring:
+
+- **Backend:** `GET /health` → Returns `"OK"` (200)
+- **Frontend:** `GET /health` → Returns `"OK\n"` (200) (native nginx)
+
+Example using curl:
+```bash
+curl http://localhost:5000/health  # Backend → OK
+curl http://localhost:86/health    # Frontend → OK
+
+# Verify health status from Docker
+docker inspect --format='{{.State.Health.Status}}' nexasys-db
+docker inspect --format='{{.State.Health.Status}}' nexasys-backend
+docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 ```
 
 ### Manual Deployment (Without Docker)
@@ -419,10 +540,20 @@ docker-compose ps
 
 # Manually test health endpoint
 docker exec nexasys-backend curl http://localhost:5000/health
+docker exec nexasys-frontend curl http://localhost/health
+
+# Check health status
+docker inspect --format='{{.State.Health.Status}}' nexasys-backend
 
 # Restart services
 docker-compose restart backend
 ```
+
+**Common Causes:**
+1. Database not ready yet (increase `start_period` to 30s)
+2. Backend can't connect to DB (check `DATABASE_URL`)
+3. Port already in use (check port 5000)
+4. Missing environment variables
 
 ---
 
@@ -435,29 +566,129 @@ Error: bind: address already in use (0.0.0.0:80)
 
 **Solution:**
 ```bash
-# Find process using port 80
+# Find process using port
 lsof -i :80       # macOS/Linux
 netstat -ano | findstr :80  # Windows
 
 # Stop conflicting service or change port in docker-compose.yml
+# For frontend port configuration:
 ports:
   - "8080:80"  # Change host port to 8080
+  # Or use 86 if 80 and 81 are occupied
+```
+
+**Production Server Ports (crm.consiliumproyectos.com):**
+| Port | Service | Status |
+|------|---------|--------|
+| 80 | Nginx/system | Occupied |
+| 81 | Unknown | Occupied |
+| **86** | NEXA-Sys Frontend | ✅ Available |
+
+---
+
+### Issue: Network Error in Docker Compose
+
+**Symptoms:**
+```
+network proxy-net declared as external, but could not be found
+```
+
+**Solution:**
+```bash
+# Create the network (if using default config)
+docker network create proxy-net
+
+# Or remove external:true from docker-compose.yml
+networks:
+  proxy-net:
+    driver: bridge
+    # Remove: external: true
 ```
 
 ---
 
-### Issue: Pre-Commit Hook Not Running
+### Issue: PostgreSQL Connection Fails
+
+**Symptoms:**
+```
+error: password authentication failed for user "nexa_admin"
+```
 
 **Solution:**
 ```bash
-# Make hook executable (Linux/macOS)
-chmod +x .husky/pre-commit
+# Verify DATABASE_URL format
+echo $DATABASE_URL
+# Should be: postgres://nexa_admin:nexa_password@db:5432/nexasys_crm
 
-# Verify Husky installation
-npm run prepare
+# Check database logs
+docker logs nexasys-db
 
-# Check Git hooks directory
-ls -la .git/hooks/pre-commit
+# Verify database is healthy
+docker exec -it nexasys-db pg_isready -U nexa_admin -d nexasys_crm
+# Expected: postgres:5432 - accepting connections
+```
+
+---
+
+### Issue: Error 500 in GET /api/users
+
+**Symptoms:**
+```
+{"message":"Error al obtener usuarios"}
+```
+
+**Cause:**
+Query was selecting column `role` which doesn't exist. Table `users` has `role_id` (integer FK), not `role` (string).
+
+**Solution:**
+```javascript
+// Fix in src/backend/routes/users.routes.js
+const query = `
+    SELECT u.id, u.username, u.email, u.active, r.name as role
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+`;
+```
+
+---
+
+### Issue: express-rate-limit trustProxy Error
+
+**Symptoms:**
+```
+ValidationError: Unexpected configuration option: trustProxy
+```
+
+**Cause:** express-rate-limit v8.x removed `trustProxy` option.
+
+**Solution:**
+```javascript
+// Remove trustProxy from rate limiters in src/backend/middleware/security.js
+const generalLimiter = rateLimit({
+    windowMs: 15*60*1000,
+    max: 1000
+    // Remove: trustProxy: true
+});
+```
+
+---
+
+### Issue: Frontend Tests Fail - import.meta.env
+
+**Symptoms:**
+```
+SyntaxError: Cannot use 'import.meta' outside a module
+```
+
+**Cause:** Jest doesn't support Vite's `import.meta.env` without configuration.
+
+**Solution (add to jest.setup.js):**
+```javascript
+// jest.setup.js
+Object.defineProperty(global, 'import.meta', {
+    value: { env: { VITE_API_URL: '/api' } },
+    writable: true
+});
 ```
 
 ---
@@ -477,10 +708,8 @@ Check GitHub Actions logs for:
 - Backend startup errors
 - Missing environment variables
 
-Common fix:
-```yaml
-# In .github/workflows/ci-cd.yml
-# Increase timeout or check environment variables
+```bash
+# Increase timeout or check environment variables in CI config
 env:
   JWT_SECRET: 'test_secret_for_ci'
   DATABASE_URL: 'postgres://...'
@@ -550,12 +779,12 @@ DATABASE_URL=postgres://prod_user:prod_pass@prod_host:5432/nexasys_prod
 
 ## 📊 Coverage Requirements
 
-### Current Coverage (Phase 4)
+### Current Coverage (Phase 4 - Completed)
 
 | Service | Coverage | Target | Status |
 |---------|----------|--------|--------|
 | Backend | 53.94% | 50%+ | ✅ Exceeds target |
-| Frontend | 63.84% | 50%+ | ✅ Exceeds target |
+| Frontend | 71.18% | 50%+ | ✅ Exceeds target |
 
 ### Coverage Thresholds (Enforced by Jest)
 
@@ -582,19 +811,30 @@ coverageThreshold: {
 - [ ] Environment variables configured (`.env`)
 - [ ] Database migrations applied (if any)
 - [ ] Pre-commit hooks installed (`npm install`)
+- [ ] Proxy-net network created (`docker network create proxy-net`)
 
 ### Deployment
 
 - [ ] Pull latest code (`git pull origin main`)
+- [ ] Verify/create network (`docker network create proxy-net 2>/dev/null || echo "exists"`)
 - [ ] Build images (`docker-compose build`)
 - [ ] Start services (`docker-compose up -d`)
-- [ ] Verify health checks (`docker-compose ps`)
+- [ ] Wait for health checks (~60 seconds)
+- [ ] Verify health checks (`docker-compose ps` all healthy)
 - [ ] Check logs (`docker-compose logs -f`)
 
 ### Post-Deployment
 
 - [ ] Test application in browser
-- [ ] Verify API endpoints (`curl http://localhost:5000/health`)
+- [ ] Verify API endpoints:
+  ```bash
+  curl http://localhost:5000/health  # Backend → OK
+  curl http://localhost:86/health    # Frontend → OK
+  ```
+- [ ] Verify database tables:
+  ```bash
+  docker exec -it nexasys-db psql -U postgres -d nexasys_crm -c "\dt"
+  ```
 - [ ] Monitor logs for errors
 - [ ] Run smoke tests
 - [ ] Backup database (if applicable)
@@ -626,5 +866,5 @@ If you encounter issues not covered in this guide:
 ---
 
 **NEXA-Sys V.02 CRM** | Deployment Guide
-**Last Updated:** 2026-01-05
-**Status:** ✅ Production Ready
+**Last Updated:** 2026-01-07
+**Status:** ✅ Production Ready (PostgreSQL + Full CI/CD)

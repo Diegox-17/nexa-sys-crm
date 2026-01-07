@@ -2,16 +2,18 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { usersAPI } from '../../services/api';
+import Sidebar from '../../components/Sidebar';
 import './UserManagement.css';
 
 const UserManagement = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const [users, setUsers] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [roleFilter, setRoleFilter] = useState('all');
     const [editingId, setEditingId] = useState(null);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -96,24 +98,10 @@ const UserManagement = () => {
 
     return (
         <div className="layout">
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <img src="/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys" />
-                </div>
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" className="nav-item">Panel</Link>
-                    <Link to="/clients" className="nav-item">Clientes</Link>
-                    <Link to="/projects" className="nav-item">Proyectos</Link>
-                    <Link to="/users" className="nav-item active">Gestión de Usuarios</Link>
-                </nav>
-                <div className="sidebar-footer">
-                    <button onClick={() => { logout(); window.location.href = '/login'; }} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {(user?.role || 'UNKNOWN').toUpperCase()}<br />
-                        SEC_LEVEL: 1
-                    </div>
-                </div>
-            </aside>
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
 
             <header className="topbar">
                 <div className="breadcrumbs">SISTEMA / ADMIN / GESTIÓN_USUARIOS</div>

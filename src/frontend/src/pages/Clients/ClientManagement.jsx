@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { clientsAPI, projectsAPI } from '../../services/api';
+import Sidebar from '../../components/Sidebar';
 import './ClientManagement.css';
 
 const ClientManagement = () => {
@@ -15,6 +16,7 @@ const ClientManagement = () => {
     const [showFieldModal, setShowFieldModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingField, setIsEditingField] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Form State for Client
     const [formData, setFormData] = useState({
@@ -177,26 +179,10 @@ const ClientManagement = () => {
 
     return (
         <div className="layout">
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <img src="/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys" />
-                </div>
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" className="nav-item">Panel</Link>
-                    <Link to="/clients" className="nav-item active">Clientes</Link>
-                    <Link to="/projects" className="nav-item">Proyectos</Link>
-                    {(user?.role === 'admin' || user?.role === 'manager') &&
-                        <Link to="/users" className="nav-item">Gestión de Usuarios</Link>
-                    }
-                </nav>
-                <div className="sidebar-footer">
-                    <button onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/login'; }} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {user?.role.toUpperCase()}<br />
-                        SEC_LEVEL: 1
-                    </div>
-                </div>
-            </aside>
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
 
             <header className="topbar">
                 <div className="breadcrumbs">SISTEMA / CLIENTES</div>

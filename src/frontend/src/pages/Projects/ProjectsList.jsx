@@ -3,10 +3,45 @@ import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { projectsAPI, clientsAPI, usersAPI } from '../../services/api';
 import ProjectFieldManager from '../../components/ProjectFieldManager';
+import Sidebar from '../../components/Sidebar';
 import './ProjectsList.css';
 
+/**
+ * ProjectsList Component - Gestión de Proyectos CRM
+ *
+ * Componente principal para listar, crear y editar proyectos.
+ * Incluye KPIs de progreso, filtrado por estado y gestión de campos personalizados.
+ *
+ * @component
+ * @requires useAuth - Contexto de autenticación
+ * @requires projectsAPI - API de proyectos
+ * @requires clientsAPI - API de clientes
+ * @requires usersAPI - API de usuarios
+ *
+ * @features
+ * - Lista interactiva de proyectos con KPIs en tiempo real
+ * - Creación y edición de proyectos con formulario validado
+ * - Eliminación lógica (soft-delete) vía API
+ * - Búsqueda filtrada por estado
+ * - Gestión de campos personalizados (BUG #026)
+ * - Cálculo automático de progreso basado en tareas
+ *
+ * @bugs-fixes
+ * - BUG-032: Avance sincronizado con tasks
+ * - BUG-034: Presupuesto y Avance se almacenan correctamente
+ * - BUG-041: useCallback implementado para optimizar calls al backend
+ *
+ * @example
+ * ```jsx
+ * import ProjectsList from './pages/Projects/ProjectsList';
+ *
+ * function App() {
+ *   return <ProjectsList />;
+ * }
+ * ```
+ */
 const ProjectsList = () => {
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
     const [clients, setClients] = useState([]);
@@ -19,6 +54,7 @@ const ProjectsList = () => {
     const [editingProject, setEditingProject] = useState(null);
     const [fieldData, setFieldData] = useState({ id: null, name: '', label: '', type: 'text', category: 'General', is_required: false, sort_order: 0, options: [], active: true });
     const [isEditingField, setIsEditingField] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // Form State for Project
     const [formData, setFormData] = useState({
@@ -259,27 +295,11 @@ const ProjectsList = () => {
 
     return (
         <div className="layout">
-            {/* SIDEBAR - Using CSS classes instead of inline styles */}
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <img src="/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys" />
-                </div>
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" className="nav-item">Panel</Link>
-                    <Link to="/clients" className="nav-item">Clientes</Link>
-                    <Link to="/projects" className="nav-item active">Proyectos</Link>
-                    {(user?.role === 'admin' || user?.role === 'manager') && (
-                        <Link to="/users" className="nav-item">Gestión de Usuarios</Link>
-                    )}
-                </nav>
-                <div className="sidebar-footer">
-                    <button onClick={() => { logout(); window.location.href = '/login'; }} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {user?.role.toUpperCase()}<br />
-                        SEC_LEVEL: 1
-                    </div>
-                </div>
-            </aside>
+            {/* SIDEBAR */}
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
 
             {/* TOPBAR - With links*/}
             <header className="topbar">

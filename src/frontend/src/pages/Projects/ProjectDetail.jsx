@@ -3,11 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { projectsAPI, usersAPI, clientsAPI } from '../../services/api';
 import KanbanBoard from '../../components/KanbanBoard';
+import Sidebar from '../../components/Sidebar';
 import './ProjectDetail.css';
 
 const ProjectDetail = () => {
     const { id } = useParams();
-    const { user, logout } = useAuth();
+    const { user } = useAuth();
     const [project, setProject] = useState(null);
     const [users, setUsers] = useState([]);
     const [clients, setClients] = useState([]);
@@ -19,6 +20,7 @@ const ProjectDetail = () => {
         description: '',
         assigned_to: ''
     });
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     // BUG-041 FIX: Memorizar funciones fetch con useCallback
     const fetchProject = useCallback(async () => {
@@ -125,27 +127,11 @@ const ProjectDetail = () => {
 
     return (
         <div className="layout">
-            {/* SIDEBAR - Homologated */}
-            <aside className="sidebar">
-                <div className="sidebar-brand">
-                    <img src="/assets/Logo Dark Sin Fondo.png" alt="Nexa-Sys" />
-                </div>
-                <nav style={{ flex: 1 }}>
-                    <Link to="/dashboard" className="nav-item">Panel</Link>
-                    <Link to="/clients" className="nav-item">Clientes</Link>
-                    <Link to="/projects" className="nav-item active">Proyectos</Link>
-                    {(user?.role === 'admin' || user?.role === 'manager') && (
-                        <Link to="/users" className="nav-item">Gestión de Usuarios</Link>
-                    )}
-                </nav>
-                <div className="sidebar-footer">
-                    <button onClick={() => { logout(); window.location.href = '/login'; }} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {user?.role.toUpperCase()}<br />
-                        SEC_LEVEL: 1
-                    </div>
-                </div>
-            </aside>
+            {/* SIDEBAR */}
+            <Sidebar 
+                isCollapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+            />
 
             {/* TOPBAR - Homologated - With links*/}
             <header className="topbar">
