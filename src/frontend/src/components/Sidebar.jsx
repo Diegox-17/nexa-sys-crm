@@ -32,7 +32,7 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
     return (
         <>
             {/* Mobile Toggle Button */}
-            <button 
+            <button
                 className={`mobile-toggle ${isMobileOpen ? 'active' : ''}`}
                 onClick={toggleMobile}
                 aria-label="Toggle menu"
@@ -53,9 +53,9 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                         {/* Full logo when expanded */}
                         {!isCollapsed && (
                             <div className="sidebar-logo-full">
-                                <img 
-                                    src="/assets/Logo Light Sin fondo.png" 
-                                    alt="Nexa-Sys" 
+                                <img
+                                    src="/assets/Logo Dark Sin fondo.png"
+                                    alt="Nexa-Sys"
                                     className="sidebar-logo-img"
                                 />
                             </div>
@@ -63,9 +63,9 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                         {/* Small icon logo when collapsed */}
                         {isCollapsed && (
                             <div className="sidebar-logo-collapsed">
-                                <img 
-                                    src="/assets/Logo f negro Vectorizado.svg" 
-                                    alt="N" 
+                                <img
+                                    src="/assets/Favicon Vectorizado.svg"
+                                    alt="N"
                                     className="sidebar-icon-img"
                                 />
                             </div>
@@ -75,8 +75,8 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
 
                 {/* Toggle Button - Outside the header, positioned correctly */}
                 {!isMobileOpen && (
-                    <button 
-                        className="sidebar-toggle-btn" 
+                    <button
+                        className="sidebar-toggle-btn"
                         onClick={onToggle}
                         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                         title={isCollapsed ? 'Expandir' : 'Contraer'}
@@ -88,9 +88,9 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                 {/* Navigation */}
                 <nav className="sidebar-nav">
                     {navItems.map((item) => (
-                        <Link 
+                        <Link
                             key={item.path}
-                            to={item.path} 
+                            to={item.path}
                             className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
                             onClick={closeMobile}
                             title={item.label}
@@ -117,8 +117,8 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                     )}
 
                     {/* Logout Button */}
-                    <button 
-                        className="nav-item logout-btn" 
+                    <button
+                        className="nav-item logout-btn"
                         onClick={handleLogout}
                         title="Cerrar sesión"
                     >
