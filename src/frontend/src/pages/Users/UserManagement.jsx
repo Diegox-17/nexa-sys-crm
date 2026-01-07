@@ -109,7 +109,7 @@ const UserManagement = () => {
                 <div className="sidebar-footer">
                     <button onClick={() => { logout(); window.location.href = '/login'; }} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {user?.role.toUpperCase()}<br />
+                        ROLE: {(user?.role || 'UNKNOWN').toUpperCase()}<br />
                         SEC_LEVEL: 1
                     </div>
                 </div>
@@ -183,7 +183,7 @@ const UserManagement = () => {
                                         </div>
                                     </td>
                                     <td>{u.email}</td>
-                                    <td><span className={`badge badge-${u.role}`}>{u.role.toUpperCase()}</span></td>
+                                    <td><span className={`badge badge-${u.role || 'user'}`}>{(u.role || 'user').toUpperCase()}</span></td>
                                     <td>
                                         <span className={`status-dot ${u.active ? 'status-active' : 'status-inactive'}`}></span>
                                         {u.active ? 'Activo' : 'Inactivo'}

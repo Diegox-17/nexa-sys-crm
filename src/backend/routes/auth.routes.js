@@ -24,6 +24,7 @@ router.post('/login', validateBody(loginSchema), async (req, res) => {
                 JOIN roles r ON u.role_id = r.id
                 WHERE u.username = $1
             `, [user]);
+            console.log('[AUTH DEBUG] Query result for user:', user, result.rows[0]);
             if (result.rows.length > 0) foundUser = result.rows[0];
         } else {
             const { users } = getInMemoryData();
@@ -58,6 +59,7 @@ router.post('/login', validateBody(loginSchema), async (req, res) => {
                 role: foundUser.role
             }
         });
+        console.log('[AUTH DEBUG] Response sent:', { user_info: { id: foundUser.id, username: foundUser.username, email: foundUser.email, role: foundUser.role } });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: 'Error interno del servidor' });

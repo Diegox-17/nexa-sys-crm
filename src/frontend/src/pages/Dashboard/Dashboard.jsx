@@ -90,7 +90,7 @@ const Dashboard = () => {
                 <div className="sidebar-footer">
                     <button onClick={handleLogout} className="btn btn-outline" style={{ width: '100%', fontSize: '0.75rem' }}>SALIR</button>
                     <div style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontFamily: 'var(--font-mono)', marginTop: '1rem' }}>
-                        ROLE: {user?.role.toUpperCase()}<br />
+                        ROLE: {(user?.role || 'UNKNOWN').toUpperCase()}<br />
                         SEC_LEVEL: 1
                     </div>
                 </div>
@@ -110,8 +110,8 @@ const Dashboard = () => {
                     <div style={{ flex: 1 }}>
                         <h1>{user?.username}</h1>
                         <p className="text-cyan">Rol: {
-                            user?.role === 'admin' ? 'Administrador del Sistema' :
-                                user?.role === 'manager' ? 'Manager' :
+                            (user?.role || 'user') === 'admin' ? 'Administrador del Sistema' :
+                                (user?.role || 'user') === 'manager' ? 'Manager' :
                                     'Usuario Estándar'
                         }</p>
                     </div>

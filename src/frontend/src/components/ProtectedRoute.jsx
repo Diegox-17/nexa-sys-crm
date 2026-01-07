@@ -7,10 +7,16 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
     console.log('[ProtectedRoute] Loading:', loading);
     console.log('[ProtectedRoute] User:', user);
+    console.log('[ProtectedRoute] User keys:', user ? Object.keys(user) : 'N/A');
+    console.log('[ProtectedRoute] User.role:', user?.role);
+    console.log('[ProtectedRoute] User.role_id:', user?.role_id);
     console.log('[ProtectedRoute] AllowedRoles:', allowedRoles);
     console.log('[ProtectedRoute] Children provided:', !!children);
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) {
+        console.log('[ProtectedRoute] Still loading, showing loading...');
+        return <div>Cargando...</div>;
+    }
 
     if (!user) {
         console.warn('[ProtectedRoute] No user found, redirecting to login');
@@ -23,6 +29,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
     }
 
     // Support both Wrapper pattern (children) and Layout pattern (Outlet)
+    console.log('[ProtectedRoute] Access granted, rendering children/Outlet');
     return children ? children : <Outlet />;
 };
 

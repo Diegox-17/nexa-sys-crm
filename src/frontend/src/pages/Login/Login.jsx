@@ -15,11 +15,13 @@ const Login = () => {
         e.preventDefault();
         setError('');
         try {
-            const data = await authAPI.login(username, password);
-            console.log('[FRONTEND DEBUG] Login response:', data);
-            console.log('[FRONTEND DEBUG] user_info received:', data.user_info);
-            console.log('[FRONTEND DEBUG] user_info.role:', data.user_info?.role);
+        const data = await authAPI.login(username, password);
+            console.log('[LOGIN DEBUG] Login response:', data);
+            console.log('[LOGIN DEBUG] user_info received:', data.user_info);
+            console.log('[LOGIN DEBUG] user_info.role:', data.user_info?.role);
+            console.log('[LOGIN DEBUG] user_info keys:', Object.keys(data.user_info || {}));
             login(data.user_info, data.token);
+            console.log('[LOGIN DEBUG] After login - localStorage user:', localStorage.getItem('user'));
             navigate('/dashboard');
         } catch (err) {
             setError(err.message || 'Error de conexión con el servidor');
