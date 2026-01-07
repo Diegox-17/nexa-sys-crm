@@ -19,14 +19,14 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
     const closeMobile = () => setIsMobileOpen(false);
 
     const navItems = [
-        { path: '/dashboard', label: 'Panel', icon: '◈' },
-        { path: '/clients', label: 'Clientes', icon: '◉' },
+        { path: '/dashboard', label: 'Panel', icon: '◆' },
+        { path: '/clients', label: 'Clientes', icon: '●' },
         { path: '/projects', label: 'Proyectos', icon: '◎' },
     ];
 
     // Agregar Gestión de Usuarios solo para admin/manager
     if (user?.role === 'admin' || user?.role === 'manager') {
-        navItems.push({ path: '/users', label: 'Usuarios', icon: '●' });
+        navItems.push({ path: '/users', label: 'Usuarios', icon: '◉' });
     }
 
     return (
@@ -47,24 +47,43 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
 
             {/* Sidebar */}
             <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
-                {/* Header with Logo and Toggle */}
+                {/* Header Section */}
                 <div className="sidebar-header">
-                    <div className="sidebar-brand">
-                        <img 
-                            src="/assets/Logo Dark Sin Fondo.png" 
-                            alt="Nexa-Sys" 
-                            className="sidebar-logo"
-                        />
-                        {!isCollapsed && <span className="sidebar-title">NEXA-SYS</span>}
+                    <div className="sidebar-brand-container">
+                        {/* Full logo when expanded */}
+                        {!isCollapsed && (
+                            <div className="sidebar-logo-full">
+                                <img 
+                                    src="/assets/Logo Light Sin fondo.png" 
+                                    alt="Nexa-Sys" 
+                                    className="sidebar-logo-img"
+                                />
+                            </div>
+                        )}
+                        {/* Small icon logo when collapsed */}
+                        {isCollapsed && (
+                            <div className="sidebar-logo-collapsed">
+                                <img 
+                                    src="/assets/Logo f negro Vectorizado.svg" 
+                                    alt="N" 
+                                    className="sidebar-icon-img"
+                                />
+                            </div>
+                        )}
                     </div>
+                </div>
+
+                {/* Toggle Button - Outside the header, positioned correctly */}
+                {!isMobileOpen && (
                     <button 
-                        className="sidebar-toggle" 
+                        className="sidebar-toggle-btn" 
                         onClick={onToggle}
                         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        title={isCollapsed ? 'Expandir' : 'Contraer'}
                     >
-                        {isCollapsed ? '→' : '←'}
+                        <span className="toggle-icon">{isCollapsed ? '→' : '←'}</span>
                     </button>
-                </div>
+                )}
 
                 {/* Navigation */}
                 <nav className="sidebar-nav">
@@ -103,7 +122,7 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                         onClick={handleLogout}
                         title="Cerrar sesión"
                     >
-                        <span className="nav-icon">⊗</span>
+                        <span className="nav-icon">✕</span>
                         {!isCollapsed && <span className="nav-label">SALIR</span>}
                     </button>
 

@@ -4,6 +4,65 @@ Todos los cambios notables en este proyecto serán documentados en este archivo 
 
 ---
 
+## [1.5.1-fase4.sidebar.fix] - 2026-01-07
+
+### 🎨 Mejoras Visuales del Sidebar
+
+| Aspecto | Valor |
+|---------|-------|
+| **Estado** | ✅ CORREGIDO |
+| **Diseño** | Industrial-Digital (Deep Midnight Blue + Electric Cyan) |
+
+### 📋 Correcciones Realizadas
+
+| Issue | Descripción |
+|-------|-------------|
+| **Logo overlap** | Corregida la superposición entre logo y botón toggle |
+| **Collapsed logo** | Agregado logo separado para estado colapsado (`Logo f negro Vectorizado.svg`) |
+| **Iconografía** | Usados iconos simples (◆, ●, ◎, ◉) más limpios |
+| **Colores** | Aplicada paleta oficial: #0B1E3B (fondo), #00F0Cyan (acento), #64748B (texto) |
+| **Toggle button** | Posicionado correctamente, sin superposición |
+
+### 📁 Archivos Modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `components/Sidebar.jsx` | Logo separado para expanded/collapsed, toggle reposicionado |
+| `components/Sidebar.css` | Diseño Industrial-Digital, sin superposiciones |
+
+### 📱 Preview Mejorado
+
+```
+EXPANDED (260px):
+┌─────────────────────────────────────┐
+│                                     │
+│    [Logo NEXA-SYS completo]         │
+│                                     │
+│  ◆ Panel                            │
+│  ● Clientes                         │
+│  ◎ Proyectos                       │
+│  ◉ Usuarios                        │
+├─────────────────────────────────────┤
+│  [US] Username              ✕ SALIR│
+│  USER                      SEC_LVL 1│
+└─────────────────────────────────────┘
+
+COLLAPSED (72px):
+┌────────────────┐
+│                │
+│    [Logo N]    │
+│                │
+│       ◆        │
+│       ●        │
+│       ◎        │
+│       ◉        │
+├────────────────┤
+│      [US]  ✕   │
+└────────────────┘
+```
+
+---
+
 ## [1.5.0-fase4.sidebar] - 2026-01-07
 
 ### ✨ Nueva Característica: Sidebar Collapsible y Mobile-Friendly
