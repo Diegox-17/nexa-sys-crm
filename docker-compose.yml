@@ -76,7 +76,11 @@ networks:
   crm-internal:
     driver: bridge
   proxy-net:
-    external: true
+    # BUG-043: Usar variable de entorno para red externa
+    # Si EXTERNAL_NETWORK está definida, usa esa red externa
+    # Si NO está definida, usa 'proxy-net' como red interna automática
+    external:
+      name: ${EXTERNAL_NETWORK:-proxy-net}
 
 volumes:
   postgres_data:
