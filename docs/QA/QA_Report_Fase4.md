@@ -400,127 +400,113 @@ Los 18 tests que siguen fallando **NO SON BLOQUEANTES** porque:
 
 ---
 
-## 🐛 BUG-043: Docker Compose Smoke Test Failed - Health Check Timeout (ACTUALIZADO)
+## 🐛 BUG-043: Docker Compose Smoke Test Failed - Error Red Externa (ACTUALIZADO)
 
 | Aspecto | Valor |
 |---------|-------|
 | **ID** | BUG-043 |
 | **Severidad** | 🔴 CRÍTICA |
 | **Tipo** | CI/CD - Docker Infrastructure |
-| **Estado** | 🔴 **ABIERTO - EN PROCESO** |
+| **Estado** | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
 | **Fecha Detectado** | 2026-01-06 |
-| **Fecha Actualizado** | 2026-01-07 |
+| **Fecha Corregido** | 2026-01-07 |
 | **Pipeline Stage** | Stage 5: Docker Compose Smoke Test |
 
-### 📋 Errores Actuales en CI/CD
+### 📋 Error en CI/CD
 
 ```
 Start Services with Docker Compose:
 network proxy-net declared as external, but could not be found
 Error: Process completed with exit code 1.
-
-Show Docker Logs on failure:
-Error response from daemon: No such container: nexasys-backend
-Error: Process completed with exit code 1.
 ```
 
-### ✅ Acciones Implementadas por DevOps
+### 📊 Causa Raíz
 
-**Archivo Modificado:** `docker-compose.yml:78-80`
+**Problema:** La red `proxy-net` estaba configurada como `external: true`, lo que significa que Docker espera que la red ya exista previamente. Si no existe, el deployment falla.
 
-**Cambio Realizado:**
+**Solución:** Cambiar la red de `external: true` a red interna con `driver: bridge` (Docker la creará automáticamente).
+
+### ✅ Corrección Implementada (DevOps)
+
+**Archivo:** `docker-compose.yml` (líneas 75-83)
+
+**ANTES (PROBLEMA):**
 ```yaml
-# ANTES (PROBLEMA):
 networks:
+  crm-internal:
+    driver: bridge
   proxy-net:
-    external: true
-
-# DESPUÉS (IMPLEMENTADO):
-networks:
-  proxy-net:
-    external:
-      name: ${EXTERNAL_NETWORK:-proxy-net}
+    external: true  # ⚠️ PROBLEMA: Espera que la red ya exista
 ```
 
-### 📊 Análisis de Causa Raíz Actualizado
-
-| Error | Causa | Estado |
-|-------|-------|--------|
-| `proxy-net declared as external, but could not be found` | La red externa no existe en el servidor | ⚠️ Esperando acción en servidor |
-| `No such container: nexasys-backend` | El contenedor nunca se creó (falló antes) | ⚠️ Depende de la solución de red |
-
-### 📋 Deployment con Variable de Entorno
-
-**Opción A: Sin red externa (para Portainer independiente)**
-```bash
-# No definir EXTERNAL_NETWORK - usará 'proxy-net' como nombre de red
-# Si la red no existe, Docker la creará automáticamente
-docker compose up -d
-```
-
-**Opción B: Con red externa existente (para Traefik/Portainer con reverse proxy)**
-```bash
-# Definir la red externa existente
-EXTERNAL_NETWORK=proxy-net docker compose up -d
-```
-
-**Opción C: En Portainer Stack YAML**
+**DESPUÉS (CORREGIDO):**
 ```yaml
-# En la configuración del Stack, agregar variable de entorno:
-environment:
-  - EXTERNAL_NETWORK=proxy-net  # Nombre de la red externa existente
+networks:
+  crm-internal:
+    driver: bridge
+  proxy-net:
+    driver: bridge  # ✅ Docker creará la red automáticamente
 ```
 
 ### 📋 Pasos para Deployment en Servidor
 
 ```bash
-# 1. Verificar si existe la red proxy-net
-docker network ls | grep proxy-net
+# 1. Hacer git pull
+git pull
 
-# 2. SI la red existe (usa Portainer con reverse proxy):
-export EXTERNAL_NETWORK=proxy-net
+# 2. Verificar la configuración
+docker compose config
+
+# 3. Levantar contenedores
 docker compose up -d
 
-# 3. SI la red NO existe (usa Portainer independiente):
-# No definir EXTERNAL_NETWORK, Docker creará la red automáticamente
-docker compose up -d
-
-# 4. Verificar que los contenedores arranquen
+# 4. Verificar estado
 docker compose ps
-
-# 5. Verificar estado de health checks
-docker inspect --format='{{.State.Health.Status}}' nexasys-backend
-docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 ```
+
+### 📋 Resultado Esperado
+
+Deberías ver los 3 contenedores ejecutándose:
+
+```
+NAME                STATUS    PORTS
+nexasys-db          Up        5432/tcp
+nexasys-backend     Up        0.0.0.0:5001->5000/tcp
+nexasys-frontend    Up        0.0.0.0:8080->80/tcp
+```
+
+### ✅ Verificación de Health Checks
+
+```bash
+# Backend
+docker inspect --format='{{.State.Health.Status}}' nexasys-backend
+# Expected: healthy
+
+# Frontend
+docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
+# Expected: healthy
+```
+
+### 📋 Todas las Correcciones del BUG-043 Implementadas
+
+| Corrección | Estado |
+|------------|--------|
+| Healthcheck Frontend (`/health` → `/`) | ✅ Implementado |
+| Healthcheck Backend (start_period: 10s → 30s) | ✅ Implementado |
+| Timeouts aumentados (3s → 5s) | ✅ Implementado |
+| Red `proxy-net` (external → internal) | ✅ Implementado |
 
 ### 🎯 Criterios de Aceptación
 
 | Criterio | Estado |
 |----------|--------|
 | Docker Compose up completa sin errores de red | ⏳ Pendiente |
-| Contenedor nexasys-backend se crea | ⏳ Pendiente |
-| Health checks responden correctamente | ✅ Implementado |
-| Frontend responde en puerto 8080 | ⏳ Pendiente |
-| Backend responde en puerto 5001 | ⏳ Pendiente |
+| Contenedor nexasys-db se crea y está healthy | ⏳ Pendiente |
+| Contenedor nexasys-backend se crea y está healthy | ⏳ Pendiente |
+| Contenedor nexasys-frontend se crea y está healthy | ⏳ Pendiente |
+| Frontend responde en http://servidor:8080 | ⏳ Pendiente |
+| Backend responde en http://servidor:5001/api | ⏳ Pendiente |
 | Smoke test pasa con exit code 0 | ⏳ Pendiente |
-
-### 📋 Acciones Completadas por DevOps
-
-| Prioridad | Acción | Estado |
-|-----------|--------|--------|
-| 🔴 CRÍTICA | Actualizar docker-compose.yml con variable EXTERNAL_NETWORK | ✅ Implementado |
-| 🔴 CRÍTICA | Documentar opciones de deployment (con/sin red externa) | ✅ Documentado |
-| 🔴 CRÍTICA | Corregir healthcheck del frontend (/health → /) | ✅ Implementado |
-| 🔴 CRÍTICA | Aumentar start_period del backend (10s → 30s) | ✅ Implementado |
-| 🔴 CRÍTICA | Aumentar timeouts de healthcheck (3s → 5s) | ✅ Implementado |
-
-### 📋 Acciones Requeridas en Servidor
-
-| Prioridad | Responsable | Acción |
-|-----------|-------------|--------|
-| 🔴 CRÍTICA | DevOps/Admin Servidor | Verificar/Crear red `proxy-net` en servidor |
-| 🔴 CRÍTICA | DevOps/Admin Servidor | Probar `docker compose up -d` con variable correcta |
-| 🟡 MEDIA | DevOps | Verificar que los health checks respondan |
 
 ---
 
@@ -972,7 +958,7 @@ docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, usernam
 
 | ID | Severidad | Tipo | Estado | Descripción |
 |----|-----------|------|--------|-------------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **EN PROCESO** | Docker Compose - Error red externa `proxy-net` |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** | Error red externa `proxy-net` - cambiada a interna |
 | **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO | init.sql tratado como directorio en servidor |
 | **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** | Error 500 en GET /api/users |
 
@@ -1013,34 +999,40 @@ docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, usernam
 
 | ID | Severidad | Tipo | Estado |
 |----|-----------|------|--------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **EN PROCESO - ESPERANDO SERVIDOR** |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
 | **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO |
 | **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** |
 
-### Para DevOps (BUG-043 - 🔴 EN PROCESO):
+### Para DevOps (BUG-043 - ✅ IMPLEMENTADO):
 
 **✅ Acciones Completadas por DevOps:**
-1. [x] Actualizar docker-compose.yml con variable `EXTERNAL_NETWORK`
+1. [x] Cambiar red `proxy-net` de `external: true` a `driver: bridge`
 2. [x] Corregir healthcheck del frontend (`/health` → `/`)
 3. [x] Aumentar start_period del backend (10s → 30s)
 4. [x] Aumentar timeouts de healthcheck (3s → 5s)
-5. [x] Documentar opciones de deployment
 
 **⏳ Esperando en Servidor:**
-1. Verificar si existe la red `proxy-net`
-2. Ejecutar `docker compose up -d` con la variable correcta
-3. Verificar que health checks respondan
+1. Verificar que Docker Compose funciona sin errores de red
+2. Ejecutar `docker compose up -d`
+3. Verificar que los 3 contenedores están healthy
 
 **Comandos para el servidor:**
 ```bash
-# Verificar red
-docker network ls | grep proxy-net
+# 1. Hacer git pull
+git pull
 
-# Opción A: Con red externa
-EXTERNAL_NETWORK=proxy-net docker compose up -d
+# 2. Verificar la configuración
+docker compose config
 
-# Opción B: Sin red externa (Docker creará automáticamente)
+# 3. Levantar contenedores
 docker compose up -d
+
+# 4. Verificar estado
+docker compose ps
+
+# 5. Verificar health checks
+docker inspect --format='{{.State.Health.Status}}' nexasys-backend
+docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 ```
 
 ### Para QA (BUG-045 - ✅ VERIFICADO):
@@ -1056,5 +1048,5 @@ docker compose up -d
 **Firmado:** @QA-Auditor-Agent
 **Implementado por:** @DevOps-Agent
 **Fecha:** 2026-01-07
-**Estado:** 🔴 **BUG-043 EN PROCESO - ESPERANDO VALIDACIÓN EN SERVIDOR**
+**Estado:** 🔴 **BUG-043 IMPLEMENTADO - ESPERANDO VALIDACIÓN EN SERVIDOR**
 **BUG-044:** ✅ Resuelto | **BUG-045:** ✅ Verificado
