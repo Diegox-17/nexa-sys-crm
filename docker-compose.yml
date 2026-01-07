@@ -59,7 +59,7 @@ services:
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:
-      - "81:80" # PUERTO 81: Puerto 81 en host (80 ocupado en servidor) - Ver docs/QA/QA_Report_Fase4.md
+      - "86:80" # PUERTO 86: Puerto 86 en host (80 y 81 ocupado en servidor) - Ver docs/QA/QA_Report_Fase4.md
     depends_on:
       backend:
         condition: service_healthy
