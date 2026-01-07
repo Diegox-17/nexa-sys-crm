@@ -1076,40 +1076,50 @@ docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, usernam
 
 | ID | Severidad | Tipo | Estado |
 |----|-----------|------|--------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | 🔴 **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | ✅ **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
 | **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO |
 | **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** |
 
 ### Para DevOps (BUG-043 - ✅ IMPLEMENTADO):
 
-**✅ Acciones Completadas por DevOps:**
-1. [x] Cambiar red `proxy-net` de `external: true` a `driver: bridge`
-2. [x] Corregir healthcheck del frontend (`/health` → `/`)
-3. [x] Aumentar start_period del backend (10s → 30s)
-4. [x] Aumentar timeouts de healthcheck (3s → 5s)
+**✅ Acciones Completadas:**
+1. [x] Frontend healthcheck: `/` → `/health` (usa endpoint nativo de nginx)
+2. [x] Interval reducido: 30s → 10s para todos los servicios
+3. [x] Red `proxy-net`: external → internal (driver: bridge)
+4. [x] Console logs [BACKEND] agregados para depuración
 
 **⏳ Esperando en Servidor:**
 1. Verificar que Docker Compose funciona sin errores de red
 2. Ejecutar `docker compose up -d`
 3. Verificar que los 3 contenedores están healthy
+4. Verificar que los console logs [BACKEND] aparecen en los logs
 
 **Comandos para el servidor:**
 ```bash
 # 1. Hacer git pull
 git pull
 
-# 2. Verificar la configuración
+# 2. Verificar/Crear la red proxy-net
+docker network create proxy-net 2>/dev/null || echo "Red ya existe"
+
+# 3. Verificar la configuración
 docker compose config
 
-# 3. Levantar contenedores
+# 4. Recrear contenedores
+docker compose down
 docker compose up -d
 
-# 4. Verificar estado
+# 5. Verificar estado (esperar ~50 segundos)
+sleep 60
 docker compose ps
 
-# 5. Verificar health checks
+# 6. Verificar health checks
+docker inspect --format='{{.State.Health.Status}}' nexasys-db
 docker inspect --format='{{.State.Health.Status}}' nexasys-backend
 docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
+
+# 7. Verificar console logs
+docker logs --tail 30 nexasys-backend 2>&1 | grep -E "\[BACKEND\]"
 ```
 
 ### Para QA (BUG-045 - ✅ VERIFICADO):
@@ -1125,5 +1135,5 @@ docker inspect --format='{{.State.Health.Status}}' nexasys-frontend
 **Firmado:** @QA-Auditor-Agent
 **Implementado por:** @DevOps-Agent
 **Fecha:** 2026-01-07
-**Estado:** 🔴 **BUG-043 REQUIERE NUEVA ARQUITECTURA - Health Checks Independientes**
+**Estado:** ✅ **BUG-043 IMPLEMENTADO - ESPERANDO VALIDACIÓN EN SERVIDOR**
 **BUG-044:** ✅ Resuelto | **BUG-045:** ✅ Verificado
