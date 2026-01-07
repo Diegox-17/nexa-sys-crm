@@ -17,7 +17,13 @@ router.post('/login', validateBody(loginSchema), async (req, res) => {
 
         if (isUsingDatabase()) {
             const pool = getPool();
-            const result = await pool.query('SELECT * FROM users WHERE username = $1', [user]);
+            // JOIN with roles table to get role name instead of role_id
+            const result = await pool.query(`
+                SELECT u.id, u.username, u.email, u.password_hash, u.active, r.name as role
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+                WHERE u.username = $1
+            `, [user]);
             if (result.rows.length > 0) foundUser = result.rows[0];
         } else {
             const { users } = getInMemoryData();
