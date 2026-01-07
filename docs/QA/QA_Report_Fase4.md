@@ -726,6 +726,101 @@ docker exec -it nexasys-frontend curl http://localhost:80/health
 
 ---
 
+## 🔧 Troubleshooting: Puerto 80 Ya Ocupado (Opción 4 - Puerto 81)
+
+### 📋 Error en Servidor
+
+```
+Failed to deploy a stack: compose up operation failed:
+Error response from daemon: driver failed programming external connectivity on endpoint nexasys-frontend:
+Bind for 0.0.0.0:80 failed: port is already allocated
+```
+
+### 📊 Causa
+
+Otro proceso ya está usando el puerto 80 en el servidor:
+- Nginx instalado directamente
+- Apache u otro servidor web
+- Otro contenedor Docker
+
+### ✅ Solución: Usar Puerto 81
+
+#### Paso 1: Cambiar docker-compose.yml
+
+```yaml
+# ANTES (usa puerto 80):
+frontend:
+  ports:
+    - "80:80"  # Puerto 80 en host
+
+# DESPUÉS (usa puerto 81):
+frontend:
+  ports:
+    - "81:80"  # Puerto 81 en host, 80 en container
+```
+
+#### Paso 2: Modificar el CICD Pipeline
+
+**Archivo:** `.github/workflows/ci-cd.yml`
+
+```yaml
+# ANTES:
+- name: Test Frontend is serving
+  run: curl -f http://localhost:80 || exit 1
+
+# DESPUÉS:
+- name: Test Frontend is serving
+  run: curl -f http://localhost:81 || exit 1
+```
+
+### 📋 Comandos para el Servidor
+
+```bash
+# 1. Verificar qué está usando el puerto 80 (opcional)
+sudo netstat -tlnp | grep :80
+
+# 2. Verificar que el puerto 81 está libre
+sudo netstat -tlnp | grep :81
+# Debe estar vacío o no aparecer nada
+
+# 3. Actualizar docker-compose.yml con puerto 81
+# Cambiar "80:80" a "81:80"
+
+# 4. Recrear contenedores
+docker compose down
+docker compose up -d
+
+# 5. Verificar
+docker compose ps
+curl http://localhost:81/
+```
+
+### 📋 Puertos Finales (Opción Puerto 81)
+
+| Servicio | Puerto Host | Puerto Container | Uso |
+|----------|-------------|------------------|-----|
+| **Frontend** | 81 | 80 | Web UI |
+| **Backend** | 5000 | 5000 | API + CICD |
+| **DB** | 5432 | 5432 | PostgreSQL |
+
+### ⚠️ Nota sobre el CICD
+
+**Importante:** Si usas el puerto 81, DEBES cambiar también el CICD pipeline para que pruebe `localhost:81` en lugar de `localhost:80`.
+
+```bash
+# Verificar el cambio en el archivo de workflow
+cat .github/workflows/ci-cd.yml | grep -A2 "Test Frontend"
+# Debe mostrar: curl -f http://localhost:81
+```
+
+---
+
+**Documentado por:** @QA-Auditor-Agent
+**Fecha:** 2026-01-07
+**Estado:** 🟡 **OPCIONES DE DEPLOYMENT DOCUMENTADAS**
+
+---
+
 ## 🐛 BUG-044: PostgreSQL init.sql No Se Carga - Is a directory
 
 | Aspecto | Valor |
@@ -1209,7 +1304,7 @@ docker exec -it nexasys-db psql -U postgres -d nexasys_db -c "SELECT id, usernam
 
 | ID | Severidad | Tipo | Estado |
 |----|-----------|------|--------|
-| **BUG-043** | 🔴 CRÍTICA | CI/CD | ✅ **IMPLEMENTADO - ESPERANDO VALIDACIÓN** |
+| **BUG-043** | 🔴 CRÍTICA | CI/CD | ✅ **IMPLEMENTADO - OPCIONES DOCUMENTADAS** | Health checks independientes + Puertos |
 | **BUG-044** | 🔴 CRÍTICA | Deployment | ✅ RESUELTO |
 | **BUG-045** | 🔴 CRÍTICA | Backend SQL | ✅ **CORREGIDO Y VERIFICADO** |
 
@@ -1268,5 +1363,5 @@ docker logs --tail 30 nexasys-backend 2>&1 | grep -E "\[BACKEND\]"
 **Firmado:** @QA-Auditor-Agent
 **Implementado por:** @DevOps-Agent
 **Fecha:** 2026-01-07
-**Estado:** ✅ **BUG-043 IMPLEMENTADO - ESPERANDO VALIDACIÓN EN SERVIDOR**
+**Estado:** ✅ **BUG-043 IMPLEMENTADO - OPCIONES DE DEPLOYMENT DOCUMENTADAS**
 **BUG-044:** ✅ Resuelto | **BUG-045:** ✅ Verificado

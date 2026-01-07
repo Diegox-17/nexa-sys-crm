@@ -221,7 +221,7 @@ jobs:
 
       - name: Test frontend is serving
         run: |
-          curl -f http://localhost:80 || exit 1
+          curl -f http://localhost:81 || exit 1
           echo "✅ Frontend is accessible"
 
       - name: Show Docker logs on failure

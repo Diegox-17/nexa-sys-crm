@@ -59,7 +59,7 @@ services:
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:
-      - "80:80" # BUG-043: Puerto 80 en host (coincide con CICD health check)
+      - "81:80" # PUERTO 81: Puerto 81 en host (80 ocupado en servidor) - Ver docs/QA/QA_Report_Fase4.md
     depends_on:
       backend:
         condition: service_healthy
