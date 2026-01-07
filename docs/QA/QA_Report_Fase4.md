@@ -502,7 +502,7 @@ services:
     container_name: nexasys-frontend
     restart: unless-stopped
     ports:
-      - "8080:80"  # Puerto 8080 para acceso web
+      - "80:80"  # Puerto 80 en host (coincide con CICD health check)
     depends_on:
       backend:
         condition: service_healthy  # Espera a que Backend esté healthy
@@ -591,7 +591,7 @@ $ docker compose ps
 NAME                STATUS          PORTS
 nexasys-db          Up (healthy)    5432/tcp
 nexasys-backend     Up (healthy)    0.0.0.0:5000->5000/tcp
-nexasys-frontend    Up (healthy)    0.0.0.0:8080->80/tcp
+nexasys-frontend    Up (healthy)    0.0.0.0:80->80/tcp
 ```
 
 ### 📋 Verificación de Endpoints
@@ -606,11 +606,11 @@ curl http://localhost:5000/health
 # Expected: OK
 
 # Frontend - Health check (independiente del backend)
-curl http://localhost:8080/health
+curl http://localhost:80/health
 # Expected: OK
 
 # Frontend - API (sí depende del backend)
-curl http://localhost:8080/api/projects
+curl http://localhost:80/api/projects
 # Expected: JSON response (a través de proxy_pass)
 ```
 
@@ -650,14 +650,14 @@ curl http://localhost:8080/api/projects
 
 ---
 
-## 🔧 Troubleshooting: Error CICD - Puerto Incorrecto
+## 🔧 Troubleshooting: Error CICD - Puerto Frontend
 
 ### 📋 Error en Pipeline
 
 ```
-Test backend health endpoint.
-Run curl -f http://localhost:5000/health || exit 1
-curl: (7) Failed to connect to localhost port 5000 after 0 ms: Couldn't connect to server
+Test Frontend is serving:
+Run curl -f http://localhost:80 || exit 1
+curl: (7) Failed to connect to localhost port 80 after 0 ms: Couldn't connect to server
 Error: Process completed with exit code 1.
 ```
 
@@ -665,45 +665,57 @@ Error: Process completed with exit code 1.
 
 | Problema | Valor |
 |----------|-------|
-| El CICD prueba `http://localhost:5000/health` | Puerto 5000 |
-| El docker-compose.yml tenía mapeo `5000:5000` | Puerto 5000 en host |
+| El CICD prueba `http://localhost:80` | Puerto 80 |
+| El docker-compose.yml tiene mapeo `80:80` | Puerto 80 en host |
 
 ### ✅ Solución
 
-**Cambiar el mapeo de puertos del backend:**
+**Cambiar el mapeo de puertos del frontend:**
 
 ```yaml
 # ANTES (INCORRECTO):
-backend:
+frontend:
   ports:
-    - "5000:5000"  # Puerto 5000 en host (coincide con CICD)
+    - "80:80"  # Puerto 80 en host (coincide con CICD)
 
 # DESPUÉS (CORRECTO):
-backend:
+frontend:
   ports:
-    - "5000:5000"  # Puerto 5000 en host (coincide con CICD)
+    - "80:80"  # Puerto 80 en host (coincide con CICD)
 ```
 
-### 📋 Puertos Correctos
+### ⚠️ Nota sobre Puerto 80 en Linux
+
+En Linux, bindear al puerto 80 requiere permisos de root. Si el contenedor se ejecuta como usuario root (típico en Docker), no hay problema.
+
+**Si falla por permisos:**
+```bash
+# Opción 1: Ejecutar el compose con sudo
+sudo docker compose up -d
+
+# Opción 2: Usar un reverse proxy (Traefik/Nginx) que escuche en 80 y redirija al 8080
+```
+
+### 📋 Puertos Finales Correctos
 
 | Servicio | Puerto Host | Puerto Container | Uso |
 |----------|-------------|------------------|-----|
+| **Frontend** | 80 | 80 | Web UI + CICD health check |
 | **Backend** | 5000 | 5000 | API + Health Check (CICD) |
-| **Frontend** | 8080 | 80 | Web UI |
 | **DB** | 5432 | 5432 | PostgreSQL (interno) |
 
-### 📋 Verificación de Puertos
+### 📋 Verificación
 
 ```bash
-# Verificar que el puerto 5000 está escuchando
-netstat -tlnp | grep 5000
+# Verificar que el puerto 80 está escuchando
+netstat -tlnp | grep 80
 
 # O usando curl desde el host
-curl http://localhost:5000/health
-# Expected: OK
+curl http://localhost/
+# Expected: HTML de la aplicación
 
 # Desde dentro del contenedor
-docker exec -it nexasys-backend curl http://localhost:5000/health
+docker exec -it nexasys-frontend curl http://localhost:80/health
 # Expected: OK
 ```
 
