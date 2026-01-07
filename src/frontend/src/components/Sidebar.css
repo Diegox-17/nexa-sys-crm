@@ -71,9 +71,10 @@
 }
 
 .sidebar-icon-img {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.3));
 }
 
 /* Toggle Button - Properly positioned */
@@ -277,7 +278,7 @@
     position: fixed;
     top: 16px;
     left: 16px;
-    z-index: 1000;
+    z-index: 1001;
     width: 44px;
     height: 44px;
     background: var(--sidebar-bg);
@@ -289,6 +290,7 @@
     align-items: center;
     gap: 5px;
     padding: 10px;
+    backdrop-filter: blur(10px);
 }
 
 .mobile-toggle span {
@@ -356,7 +358,8 @@
     /* Adjust topbar for mobile */
     .topbar {
         grid-column: 1;
-        padding-left: 72px;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     /* Adjust main content */
@@ -405,6 +408,8 @@
     padding: 0 var(--spacing-lg);
     border-bottom: 1px solid var(--sidebar-border);
     background: var(--sidebar-bg);
+    position: relative;
+    z-index: 10;
 }
 
 .user-menu {
@@ -435,6 +440,7 @@
 /* Mobile topbar adjustment */
 @media (max-width: 768px) {
     .topbar {
-        padding-left: 72px;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 }

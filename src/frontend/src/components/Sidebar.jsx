@@ -54,7 +54,7 @@ const Sidebar = ({ onToggle, isCollapsed }) => {
                         {!isCollapsed && (
                             <div className="sidebar-logo-full">
                                 <img
-                                    src="/assets/Logo Dark Sin fondo.png"
+                                    src="/assets/Logo Dark Sin Fondo.png"
                                     alt="Nexa-Sys"
                                     className="sidebar-logo-img"
                                 />
