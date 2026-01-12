@@ -5,6 +5,7 @@ import { projectsAPI, clientsAPI, usersAPI } from '../../services/api';
 import ProjectFieldManager from '../../components/ProjectFieldManager';
 import Sidebar from '../../components/Sidebar';
 import './ProjectsList.css';
+import '../../components/Sidebar.css';
 
 /**
  * ProjectsList Component - Gestión de Proyectos CRM
@@ -294,7 +295,7 @@ const ProjectsList = () => {
     };
 
     return (
-        <div className="layout">
+        <div className={`layout ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}>
             {/* SIDEBAR */}
             <Sidebar 
                 isCollapsed={sidebarCollapsed} 

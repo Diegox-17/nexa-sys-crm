@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { usersAPI } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import './UserManagement.css';
+import '../../components/Sidebar.css';
 
 const UserManagement = () => {
     const { user } = useAuth();
@@ -97,7 +98,7 @@ const UserManagement = () => {
     });
 
     return (
-        <div className="layout">
+        <div className={`layout ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}>
             <Sidebar 
                 isCollapsed={sidebarCollapsed} 
                 onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 

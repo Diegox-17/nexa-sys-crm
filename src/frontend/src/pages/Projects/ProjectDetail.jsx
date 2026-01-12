@@ -5,6 +5,7 @@ import { projectsAPI, usersAPI, clientsAPI } from '../../services/api';
 import KanbanBoard from '../../components/KanbanBoard';
 import Sidebar from '../../components/Sidebar';
 import './ProjectDetail.css';
+import '../../components/Sidebar.css';
 
 const ProjectDetail = () => {
     const { id } = useParams();
@@ -126,7 +127,7 @@ const ProjectDetail = () => {
         }, {});
 
     return (
-        <div className="layout">
+        <div className={`layout ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}>
             {/* SIDEBAR */}
             <Sidebar 
                 isCollapsed={sidebarCollapsed} 

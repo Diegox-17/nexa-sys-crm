@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { projectsAPI } from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import './Dashboard.css';
+import '../../components/Sidebar.css';
 
 const Dashboard = () => {
     const { user } = useAuth();
