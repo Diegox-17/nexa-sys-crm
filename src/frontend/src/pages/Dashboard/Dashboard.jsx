@@ -69,7 +69,7 @@ const Dashboard = () => {
     }, []);
 
     return (
-        <div className="layout">
+        <div className={`layout ${sidebarCollapsed ? 'collapsed' : 'expanded'}`}>
             <Sidebar 
                 isCollapsed={sidebarCollapsed} 
                 onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 

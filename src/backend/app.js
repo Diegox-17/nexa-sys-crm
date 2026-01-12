@@ -17,7 +17,7 @@ const projectsRoutes = require('./routes/projects.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // ============================================
 // TRUST PROXY CONFIGURATION (for Nginx reverse proxy)
@@ -105,7 +105,7 @@ const startServer = async () => {
 
         // Start server
         app.listen(PORT, () => {
-            console.log('[BACKEND] Server listening on port 5000');
+            console.log(`[BACKEND] Server listening on port ${PORT}`);
             console.log('[BACKEND] /health endpoint ready');
             console.log('[BACKEND] Environment:', process.env.NODE_ENV);
             console.log(`========================================`);
